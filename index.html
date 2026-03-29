@@ -6,576 +6,29 @@
     <title>Pie — Visual Time Blocking & Habit Tracker</title>
     <meta name="description" content="Plan your day visually with Pie, a clock-based task manager that turns your schedule into a beautiful pie chart. Track streaks, build habits, and stay productive.">
     <link rel="icon" type="image/png" href="app_icon.png">
+
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <style>
-        *, *::before, *::after {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
 
-        :root {
-            --bg-primary: #0a0e17;
-            --bg-secondary: #111827;
-            --bg-card: #1a2332;
-            --bg-card-hover: #1f2b3d;
-            --accent: #f97316;
-            --accent-glow: rgba(249, 115, 22, 0.3);
-            --accent-soft: rgba(249, 115, 22, 0.1);
-            --green: #22c55e;
-            --green-soft: rgba(34, 197, 94, 0.15);
-            --text-primary: #f1f5f9;
-            --text-secondary: #94a3b8;
-            --text-muted: #64748b;
-            --border: rgba(148, 163, 184, 0.1);
-            --gradient-hero: linear-gradient(135deg, #0a0e17 0%, #1a1025 40%, #0f1a2e 100%);
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-
-        /* ── Navbar ──────────────────────────────────── */
-        nav {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            z-index: 100;
-            padding: 16px 0;
-            background: rgba(10, 14, 23, 0.8);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--border);
-            transition: all 0.3s ease;
-        }
-
-        .nav-inner {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .nav-logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            text-decoration: none;
-            color: var(--text-primary);
-        }
-
-        .nav-logo img {
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
-        }
-
-        .nav-logo span {
-            font-size: 22px;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 32px;
-            list-style: none;
-        }
-
-        .nav-links a {
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 500;
-            transition: color 0.2s;
-        }
-
-        .nav-links a:hover {
-            color: var(--text-primary);
-        }
-
-        .nav-cta {
-            background: var(--accent);
-            color: white;
-            padding: 10px 24px;
-            border-radius: 12px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 14px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 20px var(--accent-glow);
-        }
-
-        .nav-cta:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 30px var(--accent-glow);
-        }
-
-        /* ── Hero ────────────────────────────────────── */
-        .hero {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--gradient-hero);
-            position: relative;
-            overflow: hidden;
-            padding: 120px 24px 80px;
-        }
-
-        .hero::before {
-            content: '';
-            position: absolute;
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
-            top: 10%;
-            right: -10%;
-            pointer-events: none;
-            animation: float 8s ease-in-out infinite;
-        }
-
-        .hero::after {
-            content: '';
-            position: absolute;
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(circle, rgba(34, 197, 94, 0.15) 0%, transparent 70%);
-            bottom: 10%;
-            left: -5%;
-            pointer-events: none;
-            animation: float 10s ease-in-out infinite reverse;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-30px); }
-        }
-
-        .hero-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 80px;
-            align-items: center;
-            position: relative;
-            z-index: 1;
-        }
-
-        .hero-text {
-            max-width: 560px;
-        }
-
-        .hero-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: var(--accent-soft);
-            border: 1px solid rgba(249, 115, 22, 0.2);
-            border-radius: 100px;
-            padding: 8px 16px;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--accent);
-            margin-bottom: 24px;
-        }
-
-        .hero-badge::before {
-            content: '🔥';
-        }
-
-        .hero h1 {
-            font-size: clamp(40px, 5vw, 64px);
-            font-weight: 900;
-            line-height: 1.1;
-            letter-spacing: -2px;
-            margin-bottom: 20px;
-        }
-
-        .hero h1 .gradient-text {
-            background: linear-gradient(135deg, var(--accent), #fb923c, #fbbf24);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .hero p {
-            font-size: 18px;
-            color: var(--text-secondary);
-            line-height: 1.7;
-            margin-bottom: 36px;
-        }
-
-        .hero-actions {
-            display: flex;
-            gap: 16px;
-            flex-wrap: wrap;
-        }
-
-        .btn-primary {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            background: var(--accent);
-            color: white;
-            padding: 16px 32px;
-            border-radius: 16px;
-            text-decoration: none;
-            font-weight: 700;
-            font-size: 16px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 24px var(--accent-glow);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 40px var(--accent-glow);
-        }
-
-        .btn-secondary {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            background: var(--bg-card);
-            color: var(--text-primary);
-            padding: 16px 32px;
-            border-radius: 16px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 16px;
-            transition: all 0.3s ease;
-            border: 1px solid var(--border);
-        }
-
-        .btn-secondary:hover {
-            background: var(--bg-card-hover);
-            transform: translateY(-2px);
-        }
-
-        .hero-visual {
-            display: flex;
-            justify-content: center;
-            position: relative;
-        }
-
-        .hero-visual img {
-            width: 100%;
-            max-width: 380px;
-            border-radius: 24px;
-            box-shadow: 0 20px 80px rgba(0,0,0,0.5), 0 0 60px var(--accent-glow);
-            border: 1px solid rgba(255,255,255,0.05);
-        }
-
-        /* ── Features ────────────────────────────────── */
-        .features {
-            padding: 120px 24px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .section-label {
-            display: inline-block;
-            font-size: 13px;
-            font-weight: 700;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            color: var(--accent);
-            margin-bottom: 12px;
-        }
-
-        .section-title {
-            font-size: clamp(32px, 4vw, 48px);
-            font-weight: 800;
-            letter-spacing: -1.5px;
-            margin-bottom: 16px;
-        }
-
-        .section-subtitle {
-            font-size: 18px;
-            color: var(--text-secondary);
-            max-width: 560px;
-            margin-bottom: 64px;
-        }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 24px;
-        }
-
-        .feature-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 32px;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .feature-card:hover {
-            background: var(--bg-card-hover);
-            border-color: rgba(249, 115, 22, 0.2);
-            transform: translateY(-4px);
-        }
-
-        .feature-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            margin-bottom: 20px;
-        }
-
-        .feature-icon.orange { background: var(--accent-soft); }
-        .feature-icon.green { background: var(--green-soft); }
-        .feature-icon.blue { background: rgba(59, 130, 246, 0.15); }
-        .feature-icon.purple { background: rgba(168, 85, 247, 0.15); }
-        .feature-icon.pink { background: rgba(236, 72, 153, 0.15); }
-        .feature-icon.cyan { background: rgba(6, 182, 212, 0.15); }
-
-        .feature-card h3 {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .feature-card p {
-            font-size: 14px;
-            color: var(--text-secondary);
-            line-height: 1.6;
-        }
-
-        /* ── Screenshots Showcase ────────────────────── */
-        .showcase {
-            padding: 120px 24px;
-            background: var(--bg-secondary);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .showcase::before {
-            content: '';
-            position: absolute;
-            width: 100%;
-            height: 1px;
-            top: 0;
-            background: linear-gradient(90deg, transparent, var(--accent), transparent);
-        }
-
-        .showcase-inner {
-            max-width: 1200px;
-            margin: 0 auto;
-            text-align: center;
-        }
-
-        .screenshots {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 32px;
-            margin-top: 64px;
-        }
-
-        .screenshot-card {
-            position: relative;
-            border-radius: 20px;
-            overflow: hidden;
-            border: 1px solid var(--border);
-            transition: all 0.3s ease;
-        }
-
-        .screenshot-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 16px 60px rgba(0,0,0,0.4);
-        }
-
-        .screenshot-card img {
-            width: 100%;
-            display: block;
-        }
-
-        .screenshot-label {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            padding: 16px;
-            background: linear-gradient(transparent, rgba(0,0,0,0.8));
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        /* ── Platforms ───────────────────────────────── */
-        .platforms {
-            padding: 120px 24px;
-            max-width: 1200px;
-            margin: 0 auto;
-            text-align: center;
-        }
-
-        .platform-cards {
-            display: flex;
-            justify-content: center;
-            gap: 32px;
-            margin-top: 48px;
-            flex-wrap: wrap;
-        }
-
-        .platform-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 40px 48px;
-            text-align: center;
-            transition: all 0.3s ease;
-            min-width: 240px;
-        }
-
-        .platform-card:hover {
-            background: var(--bg-card-hover);
-            transform: translateY(-4px);
-        }
-
-        .platform-card .icon {
-            font-size: 48px;
-            margin-bottom: 16px;
-        }
-
-        .platform-card h3 {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .platform-card p {
-            color: var(--text-muted);
-            font-size: 14px;
-            margin-bottom: 20px;
-        }
-
-        .platform-card .status {
-            display: inline-block;
-            padding: 6px 14px;
-            border-radius: 100px;
-            font-size: 12px;
-            font-weight: 700;
-        }
-
-        .status.available {
-            background: var(--green-soft);
-            color: var(--green);
-        }
-
-        .status.coming-soon {
-            background: var(--accent-soft);
-            color: var(--accent);
-        }
-
-        /* ── Footer ──────────────────────────────────── */
-        footer {
-            border-top: 1px solid var(--border);
-            padding: 48px 24px;
-            text-align: center;
-        }
-
-        .footer-inner {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .footer-links {
-            display: flex;
-            justify-content: center;
-            gap: 32px;
-            margin-bottom: 24px;
-            flex-wrap: wrap;
-        }
-
-        .footer-links a {
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-size: 14px;
-            transition: color 0.2s;
-        }
-
-        .footer-links a:hover {
-            color: var(--text-primary);
-        }
-
-        .footer-copy {
-            color: var(--text-muted);
-            font-size: 13px;
-        }
-
-        /* ── Responsive ──────────────────────────────── */
-        @media (max-width: 768px) {
-            .hero-content {
-                grid-template-columns: 1fr;
-                gap: 48px;
-                text-align: center;
-            }
-
-            .hero-text { max-width: none; }
-
-            .hero-actions {
-                justify-content: center;
-            }
-
-            .hero-visual {
-                order: -1;
-            }
-
-            .hero-visual img {
-                max-width: 280px;
-            }
-
-            .features-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .screenshots {
-                grid-template-columns: 1fr;
-                max-width: 400px;
-                margin-left: auto;
-                margin-right: auto;
-            }
-
-            .nav-links {
-                display: none;
-            }
-
-            .platform-cards {
-                flex-direction: column;
-                align-items: center;
-            }
-        }
-
-        @media (max-width: 1024px) and (min-width: 769px) {
-            .features-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-    </style>
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-    <!-- ── Navbar ── -->
-    <nav>
+    <!-- ═══ Side Navigation (Roman Numerals) ═══ -->
+    <nav class="side-nav" aria-label="Section navigation">
+        <a href="#hero"><span class="numeral">I</span><span class="label">Home</span></a>
+        <a href="#features"><span class="numeral">II</span><span class="label">Features</span></a>
+        <a href="#screenshots"><span class="numeral">III</span><span class="label">Screenshots</span></a>
+        <a href="#stats"><span class="numeral">IV</span><span class="label">Insights</span></a>
+        <a href="#platforms"><span class="numeral">V</span><span class="label">Platforms</span></a>
+        <a href="#download"><span class="numeral">VI</span><span class="label">Download</span></a>
+    </nav>
+
+    <!-- ═══ Top Navbar ═══ -->
+    <nav class="navbar" id="topNav">
         <div class="nav-inner">
             <a href="#" class="nav-logo">
                 <img src="app_icon.png" alt="Pie App Icon">
@@ -586,28 +39,31 @@
                 <li><a href="#screenshots">Screenshots</a></li>
                 <li><a href="#platforms">Platforms</a></li>
             </ul>
-            <a href="#platforms" class="nav-cta">Download</a>
+            <a href="#download" class="nav-cta">Download</a>
         </div>
     </nav>
 
-    <!-- ── Hero ── -->
-    <section class="hero">
+    <!-- ═══ Hero Section ═══ -->
+    <section class="hero" id="hero" data-section>
+        <canvas class="hero-canvas" id="heroCanvas"></canvas>
+        <div class="hero-bg-glow" data-parallax="8"></div>
+
         <div class="hero-content">
             <div class="hero-text">
                 <div class="hero-badge">Now available on Android & Windows</div>
                 <h1>
-                    Your day,<br>
-                    visualized as a<br>
-                    <span class="gradient-text">slice of Pie.</span>
+                    <span class="line">Your day,</span>
+                    <span class="line">visualized as a</span>
+                    <span class="line"><span class="gradient-text serif-accent">slice of Pie.</span></span>
                 </h1>
-                <p>
-                    Transform your schedule into a beautiful clock-based visual. 
-                    Block time, track streaks, and build habits — all in one 
+                <p class="hero-description">
+                    Transform your schedule into a beautiful clock-based visual.
+                    Block time, track streaks, and build habits — all in one
                     stunning, intuitive app.
                 </p>
                 <div class="hero-actions">
-                    <a href="#platforms" class="btn-primary">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    <a href="#download" class="btn-primary">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                         Get Pie Free
                     </a>
                     <a href="#features" class="btn-secondary">
@@ -615,18 +71,25 @@
                     </a>
                 </div>
             </div>
-            <div class="hero-visual">
-                <img src="screenshot_home.png" alt="Pie App — Clock-based time blocking">
+
+            <div class="hero-visual" data-parallax="15">
+                <div class="hero-phone-wrapper">
+                    <div class="hero-phone-glow"></div>
+                    <img src="screenshot_home.png" alt="Pie App — Clock-based time blocking">
+                    <!-- Floating badges -->
+                    <div class="hero-float streak" data-parallax="30">14 Day Streak</div>
+                    <div class="hero-float completion" data-parallax="25">92% Complete</div>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- ── Features ── -->
-    <section class="features" id="features">
-        <div class="section-label">Features</div>
-        <h2 class="section-title">Everything you need<br>to own your day.</h2>
-        <p class="section-subtitle">
-            Pie combines visual time blocking, habit tracking, and task management 
+    <!-- ═══ Features Section ═══ -->
+    <section class="features" id="features" data-section>
+        <div class="section-label reveal">Features</div>
+        <h2 class="section-title reveal">Everything you need<br>to own your day.</h2>
+        <p class="section-subtitle reveal">
+            Pie combines visual time blocking, habit tracking, and task management
             into one beautifully designed experience.
         </p>
 
@@ -664,37 +127,57 @@
         </div>
     </section>
 
-    <!-- ── Screenshots ── -->
-    <section class="showcase" id="screenshots">
+    <!-- ═══ Screenshots Showcase ═══ -->
+    <section class="showcase" id="screenshots" data-section>
         <div class="showcase-inner">
-            <div class="section-label">Screenshots</div>
-            <h2 class="section-title">Designed to delight.</h2>
-            <p class="section-subtitle" style="margin-left:auto;margin-right:auto;">
-                Clean, modern Material Design 3 interface with full dark mode support.
-            </p>
+            <div class="showcase-header">
+                <div class="section-label reveal">Screenshots</div>
+                <h2 class="section-title reveal">Designed to delight.</h2>
+                <p class="section-subtitle reveal">
+                    Clean, modern Material Design 3 interface with full dark mode support.
+                </p>
+            </div>
 
-            <div class="screenshots">
+            <div class="screenshots-track">
                 <div class="screenshot-card">
-                    <img src="screenshot_home.png" alt="Home — Clock View">
+                    <img src="screenshot_home.png" alt="Home — Clock View" loading="lazy">
                     <div class="screenshot-label">Clock View</div>
                 </div>
                 <div class="screenshot-card">
-                    <img src="screenshot_calendar.png" alt="Calendar — History">
+                    <img src="screenshot_calendar.png" alt="Calendar — History" loading="lazy">
                     <div class="screenshot-label">Calendar History</div>
                 </div>
                 <div class="screenshot-card">
-                    <img src="screenshot_streaks.png" alt="Streaks — Insights">
+                    <img src="screenshot_streaks.png" alt="Streaks — Insights" loading="lazy">
                     <div class="screenshot-label">Streak Insights</div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- ── Platforms ── -->
-    <section class="platforms" id="platforms">
-        <div class="section-label">Get Pie</div>
-        <h2 class="section-title">Available everywhere<br>you work.</h2>
-        <p class="section-subtitle" style="margin-left:auto;margin-right:auto;">
+    <!-- ═══ Stats Section ═══ -->
+    <section class="stats" id="stats" data-section>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number orange" data-target="14" data-suffix="+">0</div>
+                <div class="stat-label">Day Streak Record</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number green" data-target="92" data-suffix="%">0</div>
+                <div class="stat-label">Average Completion Rate</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number orange" data-target="128" data-suffix="">0</div>
+                <div class="stat-label">Total Tasks Checked</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ Platforms Section ═══ -->
+    <section class="platforms" id="platforms" data-section>
+        <div class="section-label reveal">Get Pie</div>
+        <h2 class="section-title reveal">Available everywhere<br>you work.</h2>
+        <p class="section-subtitle reveal" style="margin-left:auto;margin-right:auto;">
             Start planning on your desktop, check your schedule on mobile.
         </p>
 
@@ -720,7 +203,27 @@
         </div>
     </section>
 
-    <!-- ── Footer ── -->
+    <!-- ═══ CTA Section ═══ -->
+    <section class="cta-section" id="download" data-section>
+        <div class="cta-content">
+            <div class="section-label reveal">Ready?</div>
+            <h2 class="reveal">Start slicing<br><span class="gradient-text serif-accent">your day.</span></h2>
+            <p class="section-subtitle reveal" style="margin-left:auto;margin-right:auto;">
+                Join thousands of productive people who plan their day visually with Pie. It's free to download.
+            </p>
+            <div class="cta-buttons reveal">
+                <a href="#" class="btn-primary">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    Download for Free
+                </a>
+                <a href="#features" class="btn-secondary">
+                    Explore Features →
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ Footer ═══ -->
     <footer>
         <div class="footer-inner">
             <div class="footer-links">
@@ -733,5 +236,10 @@
         </div>
     </footer>
 
+    <!-- ═══ Scripts (CDN) ═══ -->
+    <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
