@@ -3,241 +3,406 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pie — Visual Time Blocking & Habit Tracker</title>
-    <meta name="description" content="Plan your day visually with Pie, a clock-based task manager that turns your schedule into a beautiful pie chart. Track streaks, build habits, and stay productive.">
+    <title>Pie! — Visual Time Blocking & Habit Tracker</title>
+    <meta name="description" content="Plan your day visually with Pie. A clock-based task manager that turns your schedule into a beautiful pie chart. Track streaks, build habits, stay masterful.">
+    <meta property="og:title" content="Pie! — Own Every Slice of Your Day">
+    <meta property="og:description" content="Visual time blocking, streak tracking, and habit mastery — crafted for the modern renaissance person.">
     <link rel="icon" type="image/png" href="app_icon.png">
 
-    <!-- Fonts -->
+    <!-- Fonts: Cormorant (Italic Serif) + DM Sans (Clean Modern) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
 
-    <!-- Styles -->
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-    <!-- ═══ Side Navigation (Roman Numerals) ═══ -->
-    <nav class="side-nav" aria-label="Section navigation">
-        <a href="#hero"><span class="numeral">I</span><span class="label">Home</span></a>
-        <a href="#features"><span class="numeral">II</span><span class="label">Features</span></a>
-        <a href="#screenshots"><span class="numeral">III</span><span class="label">Screenshots</span></a>
-        <a href="#stats"><span class="numeral">IV</span><span class="label">Insights</span></a>
-        <a href="#platforms"><span class="numeral">V</span><span class="label">Platforms</span></a>
-        <a href="#download"><span class="numeral">VI</span><span class="label">Download</span></a>
+    <!-- ═══ Cursor Glow ═══ -->
+    <div class="cursor-dot" id="cursorDot"></div>
+    <div class="cursor-ring" id="cursorRing"></div>
+
+    <!-- ═══ Vertical Scrollspy Nav ═══ -->
+    <nav class="side-nav" aria-label="Section navigation" id="sideNav">
+        <a href="#hero" class="side-nav-item active" data-target="hero">
+            <span class="nav-num">01</span>
+            <span class="nav-line"></span>
+            <span class="nav-label">Intro</span>
+        </a>
+        <a href="#features" class="side-nav-item" data-target="features">
+            <span class="nav-num">02</span>
+            <span class="nav-line"></span>
+            <span class="nav-label">Features</span>
+        </a>
+        <a href="#screenshots" class="side-nav-item" data-target="screenshots">
+            <span class="nav-num">03</span>
+            <span class="nav-line"></span>
+            <span class="nav-label">Gallery</span>
+        </a>
+        <a href="#manifesto" class="side-nav-item" data-target="manifesto">
+            <span class="nav-num">04</span>
+            <span class="nav-line"></span>
+            <span class="nav-label">Manifesto</span>
+        </a>
+        <a href="#platforms" class="side-nav-item" data-target="platforms">
+            <span class="nav-num">05</span>
+            <span class="nav-line"></span>
+            <span class="nav-label">Platforms</span>
+        </a>
+        <a href="#download" class="side-nav-item" data-target="download">
+            <span class="nav-num">06</span>
+            <span class="nav-line"></span>
+            <span class="nav-label">Download</span>
+        </a>
     </nav>
 
     <!-- ═══ Top Navbar ═══ -->
     <nav class="navbar" id="topNav">
         <div class="nav-inner">
-            <a href="#" class="nav-logo">
-                <img src="app_icon.png" alt="Pie App Icon">
-                <span>Pie</span>
+            <a href="#hero" class="nav-logo">
+                <img src="app_icon.png" alt="Pie App Icon" width="34" height="34">
+                <span class="logo-text">Pie<span class="logo-exclaim">!</span></span>
             </a>
             <ul class="nav-links">
                 <li><a href="#features">Features</a></li>
-                <li><a href="#screenshots">Screenshots</a></li>
+                <li><a href="#screenshots">Gallery</a></li>
                 <li><a href="#platforms">Platforms</a></li>
             </ul>
-            <a href="#download" class="nav-cta">Download</a>
+            <a href="#download" class="nav-cta" id="navCta">
+                <span>Get Free</span>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1v10M4 7l4 4 4-4M2 14h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
         </div>
     </nav>
 
-    <!-- ═══ Hero Section ═══ -->
+    <!-- ═══ HERO SECTION — Pinned + Parallax ═══ -->
     <section class="hero" id="hero" data-section>
-        <canvas class="hero-canvas" id="heroCanvas"></canvas>
-        <div class="hero-bg-glow" data-parallax="8"></div>
 
-        <div class="hero-content">
-            <div class="hero-text">
-                <div class="hero-badge">Now available on Android & Windows</div>
-                <h1>
-                    <span class="line">Your day,</span>
-                    <span class="line">visualized as a</span>
-                    <span class="line"><span class="gradient-text serif-accent">slice of Pie.</span></span>
+        <!-- Parallax Layer 0: Deep Background texture -->
+        <div class="parallax-layer layer-bg" id="layerBg" data-depth="0.02">
+            <div class="bg-texture"></div>
+            <div class="bg-vignette"></div>
+        </div>
+
+        <!-- Parallax Layer 1: Midground atmospheric glow -->
+        <div class="parallax-layer layer-mid" id="layerMid" data-depth="0.06">
+            <div class="mid-glow mid-glow-1"></div>
+            <div class="mid-glow mid-glow-2"></div>
+            <div class="mid-glow mid-glow-3"></div>
+        </div>
+
+        <!-- Parallax Layer 2: Character LEFT (flies in from left on scroll) -->
+        <div class="parallax-layer layer-char-left" id="layerCharLeft" data-depth="0.12">
+            <div class="char-block char-left">
+                <img src="screenshot_calendar.png" alt="Calendar History View" class="char-img">
+                <div class="char-glow char-glow-left"></div>
+                <div class="char-badge badge-streak">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="#FF8C42"><path d="M12 2C8.5 2 7 5 7 8c0 3 2 5 3 6-1-3 1-5 2-5 1 3 3 4 3 7 0 2-1.5 3-2 3 2 0 5-2 5-5 0-4-4-6-3-9-1 2-3 3-3 5-1-1-2-3-2-5 0-3 2-5 2-5z"/></svg>
+                    <span>14 Day Streak</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Parallax Layer 3: Character RIGHT (flies in from right on scroll) -->
+        <div class="parallax-layer layer-char-right" id="layerCharRight" data-depth="0.12">
+            <div class="char-block char-right">
+                <img src="screenshot_streaks.png" alt="Streak Insights View" class="char-img">
+                <div class="char-glow char-glow-right"></div>
+                <div class="char-badge badge-complete">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FF1493" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                    <span>92% Complete</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Parallax Layer 4: Main Hero Text (Foreground) -->
+        <div class="parallax-layer layer-text" id="layerText" data-depth="0.18">
+            <div class="hero-content">
+                <div class="hero-eyebrow">
+                    <span class="eyebrow-line"></span>
+                    <span class="eyebrow-text">Now on Android &amp; Windows</span>
+                    <span class="eyebrow-line"></span>
+                </div>
+
+                <h1 class="hero-title" id="heroTitle">
+                    <span class="hero-title-line serif-italic">Slice your</span>
+                    <span class="hero-title-line hero-brand">
+                        <span class="brand-pie">Pie</span><span class="brand-exclaim">!</span>
+                    </span>
+                    <span class="hero-title-line serif-italic hero-sub">Own every hour.</span>
                 </h1>
-                <p class="hero-description">
-                    Transform your schedule into a beautiful clock-based visual.
-                    Block time, track streaks, and build habits — all in one
-                    stunning, intuitive app.
+
+                <p class="hero-desc">
+                    Transform your schedule into a beautiful clock-based visual.<br>
+                    Block time, track streaks, build habits — ruthlessly.
                 </p>
+
                 <div class="hero-actions">
-                    <a href="#download" class="btn-primary">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                        Get Pie Free
+                    <a href="#download" class="btn-primary" id="heroCta">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        Get Pie — Free
                     </a>
-                    <a href="#features" class="btn-secondary">
-                        Learn More →
+                    <a href="#features" class="btn-ghost">
+                        Explore Features
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
                     </a>
                 </div>
-            </div>
 
-            <div class="hero-visual" data-parallax="15">
-                <div class="hero-phone-wrapper">
-                    <div class="hero-phone-glow"></div>
-                    <img src="screenshot_home.png" alt="Pie App — Clock-based time blocking">
-                    <!-- Floating badges -->
-                    <div class="hero-float streak" data-parallax="30">14 Day Streak</div>
-                    <div class="hero-float completion" data-parallax="25">92% Complete</div>
+                <div class="hero-scroll-hint" id="heroScrollHint">
+                    <div class="scroll-wheel">
+                        <div class="scroll-dot"></div>
+                    </div>
+                    <span>Scroll to reveal</span>
                 </div>
             </div>
         </div>
+
+        <!-- CENTER APP SHOWCASE (pinned center element) -->
+        <div class="hero-center-app" id="heroCenterApp">
+            <div class="center-app-glow"></div>
+            <img src="screenshot_home.png" alt="Pie App — Clock View" class="center-app-img">
+            <div class="center-app-ring ring-1"></div>
+            <div class="center-app-ring ring-2"></div>
+        </div>
+
+        <!-- Explosion Effect (mix-blend-mode: screen) -->
+        <div class="hero-explosion" id="heroExplosion">
+            <div class="explosion-core"></div>
+            <div class="explosion-ring ring-a"></div>
+            <div class="explosion-ring ring-b"></div>
+        </div>
+
+        <!-- Canvas for particles -->
+        <canvas class="hero-canvas" id="heroCanvas"></canvas>
     </section>
 
-    <!-- ═══ Features Section ═══ -->
+    <!-- ═══ FEATURES SECTION ═══ -->
     <section class="features" id="features" data-section>
-        <div class="section-label reveal">Features</div>
-        <h2 class="section-title reveal">Everything you need<br>to own your day.</h2>
-        <p class="section-subtitle reveal">
-            Pie combines visual time blocking, habit tracking, and task management
-            into one beautifully designed experience.
-        </p>
+        <div class="section-inner">
+            <header class="section-header">
+                <p class="section-kicker reveal-up">Features</p>
+                <h2 class="section-title reveal-up">Everything you need<br><em>to own your day.</em></h2>
+                <p class="section-body reveal-up">
+                    Pie combines visual time blocking, habit tracking, and task management
+                    into one beautifully designed experience — with zero bloat.
+                </p>
+            </header>
 
-        <div class="features-grid">
-            <div class="feature-card">
-                <div class="feature-icon orange">🕐</div>
-                <h3>Clock-Based Planning</h3>
-                <p>See your entire day as a pie chart on a 12-hour clock. Drag, block, and visualize your time at a glance.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon green">🔥</div>
-                <h3>Streak Tracking</h3>
-                <p>Build consistency with daily streaks. Watch your fire grow as you complete tasks day after day.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon blue">📅</div>
-                <h3>Calendar History</h3>
-                <p>Review your past performance with a visual calendar. See completion rates and identify patterns.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon purple">📝</div>
-                <h3>Encrypted Notes</h3>
-                <p>Capture ideas securely with locally encrypted notes. Your thoughts stay private, always.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon pink">✅</div>
-                <h3>Smart Checklists</h3>
-                <p>Daily tasks and persistent goals in one view. Auto-detect missed tasks and stay accountable.</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon cyan">☁️</div>
-                <h3>Cloud Sync</h3>
-                <p>Powered by Firebase. Your data syncs across devices with offline support via local caching.</p>
+            <div class="features-grid">
+                <div class="feature-card reveal-card" id="feat-clock">
+                    <div class="feat-icon-wrap feat-orange">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    </div>
+                    <h3>Clock-Based Planning</h3>
+                    <p>See your entire day as a pie chart on a 12-hour clock. Drag, block, and visualize your time at a glance.</p>
+                    <div class="feat-hover-line"></div>
+                </div>
+
+                <div class="feature-card reveal-card" id="feat-streak">
+                    <div class="feat-icon-wrap feat-magenta">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                    </div>
+                    <h3>Streak Tracking</h3>
+                    <p>Build consistency with daily streaks. Watch your fire grow as you complete tasks day after day.</p>
+                    <div class="feat-hover-line"></div>
+                </div>
+
+                <div class="feature-card reveal-card" id="feat-calendar">
+                    <div class="feat-icon-wrap feat-clay">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    </div>
+                    <h3>Calendar History</h3>
+                    <p>Review your past performance with a visual calendar. See completion rates and identify your patterns.</p>
+                    <div class="feat-hover-line"></div>
+                </div>
+
+                <div class="feature-card reveal-card" id="feat-notes">
+                    <div class="feat-icon-wrap feat-umber">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                    </div>
+                    <h3>Encrypted Notes</h3>
+                    <p>Capture ideas securely with locally encrypted notes. Your thoughts stay private — always.</p>
+                    <div class="feat-hover-line"></div>
+                </div>
+
+                <div class="feature-card reveal-card" id="feat-tasks">
+                    <div class="feat-icon-wrap feat-magenta">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                    </div>
+                    <h3>Smart Checklists</h3>
+                    <p>Daily tasks and persistent goals in one view. Auto-detect missed tasks and stay accountable.</p>
+                    <div class="feat-hover-line"></div>
+                </div>
+
+                <div class="feature-card reveal-card" id="feat-sync">
+                    <div class="feat-icon-wrap feat-clay">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/></svg>
+                    </div>
+                    <h3>Cloud Sync</h3>
+                    <p>Powered by Firebase. Your data syncs across all devices with offline support via local caching.</p>
+                    <div class="feat-hover-line"></div>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- ═══ Screenshots Showcase ═══ -->
-    <section class="showcase" id="screenshots" data-section>
-        <div class="showcase-inner">
-            <div class="showcase-header">
-                <div class="section-label reveal">Screenshots</div>
-                <h2 class="section-title reveal">Designed to delight.</h2>
-                <p class="section-subtitle reveal">
-                    Clean, modern Material Design 3 interface with full dark mode support.
+    <!-- ═══ SCREENSHOTS GALLERY ═══ -->
+    <section class="gallery" id="screenshots" data-section>
+        <div class="section-inner">
+            <header class="section-header centered">
+                <p class="section-kicker reveal-up">Gallery</p>
+                <h2 class="section-title reveal-up"><em>Designed</em> to delight.</h2>
+                <p class="section-body reveal-up">
+                    Material Design 3 with full dark mode support. Clean, precise, intentional.
+                </p>
+            </header>
+
+            <div class="gallery-track">
+                <div class="gallery-card reveal-card" style="--card-delay: 0s">
+                    <div class="gallery-img-wrap">
+                        <img src="screenshot_home.png" alt="Pie App — Clock View" loading="lazy">
+                        <div class="gallery-overlay">
+                            <span>Clock View</span>
+                        </div>
+                    </div>
+                    <p class="gallery-label">01 — Clock View</p>
+                </div>
+                <div class="gallery-card reveal-card" style="--card-delay: 0.12s">
+                    <div class="gallery-img-wrap">
+                        <img src="screenshot_calendar.png" alt="Pie App — Calendar History" loading="lazy">
+                        <div class="gallery-overlay">
+                            <span>Calendar History</span>
+                        </div>
+                    </div>
+                    <p class="gallery-label">02 — Calendar History</p>
+                </div>
+                <div class="gallery-card reveal-card" style="--card-delay: 0.24s">
+                    <div class="gallery-img-wrap">
+                        <img src="screenshot_streaks.png" alt="Pie App — Streak Insights" loading="lazy">
+                        <div class="gallery-overlay">
+                            <span>Streak Insights</span>
+                        </div>
+                    </div>
+                    <p class="gallery-label">03 — Streak Insights</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ MANIFESTO / STATS SECTION ═══ -->
+    <section class="manifesto" id="manifesto" data-section>
+        <div class="section-inner manifesto-inner">
+            <div class="manifesto-text">
+                <p class="section-kicker reveal-up">The Manifesto</p>
+                <h2 class="manifesto-quote reveal-up">
+                    <em>"Time is the canvas.<br>You are the artist.<br>Pie is the brush."</em>
+                </h2>
+                <p class="section-body reveal-up">
+                    Most productivity apps are built for compliance — for checking boxes and moving on.
+                    Pie was built for <strong>mastery</strong>. Every slice you block is a declaration of intent.
                 </p>
             </div>
-
-            <div class="screenshots-track">
-                <div class="screenshot-card">
-                    <img src="screenshot_home.png" alt="Home — Clock View" loading="lazy">
-                    <div class="screenshot-label">Clock View</div>
+            <div class="manifesto-stats">
+                <div class="stat-item reveal-card">
+                    <span class="stat-number" data-target="14" data-suffix="+">0+</span>
+                    <span class="stat-label">Day Streak Record</span>
                 </div>
-                <div class="screenshot-card">
-                    <img src="screenshot_calendar.png" alt="Calendar — History" loading="lazy">
-                    <div class="screenshot-label">Calendar History</div>
+                <div class="stat-item reveal-card">
+                    <span class="stat-number" data-target="92" data-suffix="%">0%</span>
+                    <span class="stat-label">Avg Completion Rate</span>
                 </div>
-                <div class="screenshot-card">
-                    <img src="screenshot_streaks.png" alt="Streaks — Insights" loading="lazy">
-                    <div class="screenshot-label">Streak Insights</div>
+                <div class="stat-item reveal-card">
+                    <span class="stat-number" data-target="128" data-suffix="">0</span>
+                    <span class="stat-label">Tasks Crushed</span>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- ═══ Stats Section ═══ -->
-    <section class="stats" id="stats" data-section>
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-number orange" data-target="14" data-suffix="+">0</div>
-                <div class="stat-label">Day Streak Record</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number green" data-target="92" data-suffix="%">0</div>
-                <div class="stat-label">Average Completion Rate</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number orange" data-target="128" data-suffix="">0</div>
-                <div class="stat-label">Total Tasks Checked</div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ═══ Platforms Section ═══ -->
+    <!-- ═══ PLATFORMS SECTION ═══ -->
     <section class="platforms" id="platforms" data-section>
-        <div class="section-label reveal">Get Pie</div>
-        <h2 class="section-title reveal">Available everywhere<br>you work.</h2>
-        <p class="section-subtitle reveal" style="margin-left:auto;margin-right:auto;">
-            Start planning on your desktop, check your schedule on mobile.
-        </p>
+        <div class="section-inner">
+            <header class="section-header centered">
+                <p class="section-kicker reveal-up">Availability</p>
+                <h2 class="section-title reveal-up">Everywhere<br><em>you work.</em></h2>
+            </header>
 
-        <div class="platform-cards">
-            <div class="platform-card">
-                <div class="icon">🤖</div>
-                <h3>Android</h3>
-                <p>Phones & tablets</p>
-                <span class="status available">✓ Available</span>
-            </div>
-            <div class="platform-card">
-                <div class="icon">🪟</div>
-                <h3>Windows</h3>
-                <p>Desktop experience</p>
-                <span class="status available">✓ Available</span>
-            </div>
-            <div class="platform-card">
-                <div class="icon">🍎</div>
-                <h3>iOS & macOS</h3>
-                <p>Apple ecosystem</p>
-                <span class="status coming-soon">Coming Soon</span>
+            <div class="platform-grid">
+                <div class="platform-card reveal-card">
+                    <div class="platform-icon">
+                        <!-- Android SVG -->
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="#a8c78a"><path d="M17.523 15.341a.752.752 0 1 1-1.503 0 .752.752 0 0 1 1.503 0zm-9.543 0a.752.752 0 1 1-1.503 0 .752.752 0 0 1 1.503 0zm12.38-4.438l1.65-2.858a.337.337 0 0 0-.124-.457.334.334 0 0 0-.457.124l-1.67 2.893A9.978 9.978 0 0 0 12 9.646c-1.49 0-2.9.323-4.16.895L6.172 7.712a.337.337 0 0 0-.458-.124.337.337 0 0 0-.124.457l1.651 2.858C4.956 12.155 3.296 14.501 3 17.25h18c-.296-2.749-1.956-5.095-4.64-6.347z"/></svg>
+                    </div>
+                    <h3>Android</h3>
+                    <p>Phones &amp; tablets</p>
+                    <span class="platform-status available">Available Now</span>
+                </div>
+                <div class="platform-card reveal-card">
+                    <div class="platform-icon">
+                        <!-- Windows SVG -->
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="#7eb7e8"><path d="M3 5.557L10.526 4.5V12H3V5.557zM11.474 4.363L21 3v9h-9.526V4.363zM3 13h7.526v7.443L3 19.441V13zm8.474 0H21v9l-9.526-1.363V13z"/></svg>
+                    </div>
+                    <h3>Windows</h3>
+                    <p>Desktop experience</p>
+                    <span class="platform-status available">Available Now</span>
+                </div>
+                <div class="platform-card reveal-card">
+                    <div class="platform-icon">
+                        <!-- Apple SVG -->
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="#c8c8c8"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+                    </div>
+                    <h3>iOS &amp; macOS</h3>
+                    <p>Apple ecosystem</p>
+                    <span class="platform-status soon">Coming Soon</span>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- ═══ CTA Section ═══ -->
+    <!-- ═══ CTA / DOWNLOAD SECTION ═══ -->
     <section class="cta-section" id="download" data-section>
-        <div class="cta-content">
-            <div class="section-label reveal">Ready?</div>
-            <h2 class="reveal">Start slicing<br><span class="gradient-text serif-accent">your day.</span></h2>
-            <p class="section-subtitle reveal" style="margin-left:auto;margin-right:auto;">
-                Join thousands of productive people who plan their day visually with Pie. It's free to download.
+        <div class="cta-bg-glow"></div>
+        <div class="cta-clip-wipe" id="ctaClipWipe"></div>
+        <div class="section-inner centered">
+            <p class="section-kicker reveal-up">Ready?</p>
+            <h2 class="cta-headline reveal-up">
+                Start slicing<br><em>your day.</em>
+            </h2>
+            <p class="section-body reveal-up">
+                It's free. No credit card. No excuses.<br>
+                Join thousands who plan their day with Pie.
             </p>
-            <div class="cta-buttons reveal">
-                <a href="#" class="btn-primary">
+            <div class="cta-actions reveal-up">
+                <a href="#" class="btn-primary btn-xl" id="mainCta">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                     Download for Free
                 </a>
-                <a href="#features" class="btn-secondary">
-                    Explore Features →
+                <a href="#features" class="btn-ghost">
+                    Explore Features
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
                 </a>
             </div>
         </div>
     </section>
 
     <!-- ═══ Footer ═══ -->
-    <footer>
+    <footer class="footer">
         <div class="footer-inner">
+            <div class="footer-logo">
+                <img src="app_icon.png" alt="Pie" width="28" height="28">
+                <span>Pie!</span>
+            </div>
             <div class="footer-links">
-                <a href="https://DravinRai.github.io/pie-privacy-policy/">Privacy Policy</a>
+                <a href="https://DravinRai.github.io/pie-privacy-policy/" target="_blank" rel="noopener">Privacy Policy</a>
                 <a href="mailto:support@example.com">Contact</a>
             </div>
             <p class="footer-copy">
-                © 2026 Pie. Built with ❤️ by Ankit Rai.
+                © 2026 Pie. Crafted with obsession by <strong>Ankit Rai</strong>.
             </p>
         </div>
     </footer>
 
-    <!-- ═══ Scripts (CDN) ═══ -->
-    <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js"></script>
+    <!-- ═══ Scripts ═══ -->
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js"></script>
     <script src="script.js"></script>
