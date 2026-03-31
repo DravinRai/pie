@@ -27,7 +27,7 @@
         <a href="#hero" class="side-nav-item active" data-target="hero">
             <span class="nav-num">01</span>
             <span class="nav-line"></span>
-            <span class="nav-label">Intro</span>
+            <span class="nav-label">Clock</span>
         </a>
         <a href="#features" class="side-nav-item" data-target="features">
             <span class="nav-num">02</span>
@@ -75,105 +75,51 @@
         </div>
     </nav>
 
-    <!-- ═══ HERO SECTION — Pinned + Parallax ═══ -->
+    <!-- ═══ HERO SECTION — Kinetic Timepiece Video Scrub ═══ -->
     <section class="hero" id="hero" data-section>
 
-        <!-- Parallax Layer 0: Deep Background texture -->
-        <div class="parallax-layer layer-bg" id="layerBg" data-depth="0.02">
-            <div class="bg-texture"></div>
-            <div class="bg-vignette"></div>
-        </div>
+        <!-- Scrub video: clock animation driven by scroll -->
+        <video id="hero-video" src="./clock-new-optimized.mp4" muted playsinline preload="auto"></video>
 
-        <!-- Parallax Layer 1: Midground atmospheric glow -->
-        <div class="parallax-layer layer-mid" id="layerMid" data-depth="0.06">
-            <div class="mid-glow mid-glow-1"></div>
-            <div class="mid-glow mid-glow-2"></div>
-            <div class="mid-glow mid-glow-3"></div>
-        </div>
+        <!-- Text overlay sits above the video -->
+        <div class="hero-video-overlay" id="heroVideoOverlay">
+            <div class="hero-eyebrow">
+                <span class="eyebrow-line"></span>
+                <span class="eyebrow-text">Now on Android &amp; Windows</span>
+                <span class="eyebrow-line"></span>
+            </div>
 
-        <!-- Parallax Layer 2: Character LEFT (flies in from left on scroll) -->
-        <div class="parallax-layer layer-char-left" id="layerCharLeft" data-depth="0.12">
-            <div class="char-block char-left">
-                <img src="screenshot_calendar.png" alt="Calendar History View" class="char-img">
-                <div class="char-glow char-glow-left"></div>
-                <div class="char-badge badge-streak">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="#FF8C42"><path d="M12 2C8.5 2 7 5 7 8c0 3 2 5 3 6-1-3 1-5 2-5 1 3 3 4 3 7 0 2-1.5 3-2 3 2 0 5-2 5-5 0-4-4-6-3-9-1 2-3 3-3 5-1-1-2-3-2-5 0-3 2-5 2-5z"/></svg>
-                    <span>14 Day Streak</span>
+            <h1 class="hero-title" id="heroTitle">
+                <span class="hero-brand">
+                    <span class="brand-pie">P</span><span class="brand-exclaim ligature">ie!</span>
+                </span>
+                <span class="hero-title-line serif-italic hero-sub">Own every hour.</span>
+            </h1>
+
+            <p class="hero-desc">
+                Transform your schedule into a beautiful clock-based visual.<br>
+                Block time, track streaks, build habits — ruthlessly.
+            </p>
+
+            <div class="hero-actions">
+                <a href="#download" class="btn-primary" id="heroCta">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    Get Pie — Free
+                </a>
+                <a href="#features" class="btn-ghost">
+                    Explore Features
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                </a>
+            </div>
+
+            <div class="hero-scroll-hint" id="heroScrollHint">
+                <div class="scroll-wheel">
+                    <div class="scroll-dot"></div>
                 </div>
+                <span>Scroll to scrub</span>
             </div>
         </div>
 
-        <!-- Parallax Layer 3: Character RIGHT (flies in from right on scroll) -->
-        <div class="parallax-layer layer-char-right" id="layerCharRight" data-depth="0.12">
-            <div class="char-block char-right">
-                <img src="screenshot_streaks.png" alt="Streak Insights View" class="char-img">
-                <div class="char-glow char-glow-right"></div>
-                <div class="char-badge badge-complete">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FF1493" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                    <span>92% Complete</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Parallax Layer 4: Main Hero Text (Foreground) -->
-        <div class="parallax-layer layer-text" id="layerText" data-depth="0.18">
-            <div class="hero-content">
-                <div class="hero-eyebrow">
-                    <span class="eyebrow-line"></span>
-                    <span class="eyebrow-text">Now on Android &amp; Windows</span>
-                    <span class="eyebrow-line"></span>
-                </div>
-
-                <h1 class="hero-title" id="heroTitle">
-                    <span class="hero-title-line serif-italic">Slice your</span>
-                    <span class="hero-title-line hero-brand">
-                        <span class="brand-pie">Pie</span><span class="brand-exclaim">!</span>
-                    </span>
-                    <span class="hero-title-line serif-italic hero-sub">Own every hour.</span>
-                </h1>
-
-                <p class="hero-desc">
-                    Transform your schedule into a beautiful clock-based visual.<br>
-                    Block time, track streaks, build habits — ruthlessly.
-                </p>
-
-                <div class="hero-actions">
-                    <a href="#download" class="btn-primary" id="heroCta">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                        Get Pie — Free
-                    </a>
-                    <a href="#features" class="btn-ghost">
-                        Explore Features
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-                    </a>
-                </div>
-
-                <div class="hero-scroll-hint" id="heroScrollHint">
-                    <div class="scroll-wheel">
-                        <div class="scroll-dot"></div>
-                    </div>
-                    <span>Scroll to reveal</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- CENTER APP SHOWCASE (pinned center element) -->
-        <div class="hero-center-app" id="heroCenterApp">
-            <div class="center-app-glow"></div>
-            <img src="screenshot_home.png" alt="Pie App — Clock View" class="center-app-img">
-            <div class="center-app-ring ring-1"></div>
-            <div class="center-app-ring ring-2"></div>
-        </div>
-
-        <!-- Explosion Effect (mix-blend-mode: screen) -->
-        <div class="hero-explosion" id="heroExplosion">
-            <div class="explosion-core"></div>
-            <div class="explosion-ring ring-a"></div>
-            <div class="explosion-ring ring-b"></div>
-        </div>
-
-        <!-- Canvas for particles -->
-        <canvas class="hero-canvas" id="heroCanvas"></canvas>
     </section>
 
     <!-- ═══ FEATURES SECTION ═══ -->

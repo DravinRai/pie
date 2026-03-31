@@ -1,7 +1,7 @@
 /* ═══════════════════════════════════════════════════════════════
-   PIE! — RENAISSANCE ANIMATION ENGINE
+   PIE! — KINETIC TIMEPIECE EDITION
    Vanilla JS + GSAP 3 + ScrollTrigger
-   Architecture: Mouse Parallax (lerp) + Scroll Scrub + Scrollspy
+   Architecture: Video Scrub Hero + Scroll Reveals + Scrollspy
    ═══════════════════════════════════════════════════════════════ */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -51,164 +51,20 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('scroll', updateNavbar, { passive: true });
     updateNavbar();
 
-    // ── 4. Canvas Particle System ──────────────────────────────
-    const canvas = document.getElementById('heroCanvas');
-    if (canvas) {
-        const ctx = canvas.getContext('2d');
-        let W = 0, H = 0;
-
-        function resizeCanvas() {
-            W = canvas.width  = canvas.offsetWidth;
-            H = canvas.height = canvas.offsetHeight;
-        }
-        resizeCanvas();
-
-        const resizeObserver = new ResizeObserver(resizeCanvas);
-        resizeObserver.observe(canvas);
-
-        const PARTICLE_COUNT = 60;
-
-        class Particle {
-            constructor() { this.reset(true); }
-
-            reset(init = false) {
-                this.x        = Math.random() * W;
-                this.y        = init ? Math.random() * H : H + 10;
-                this.vx       = (Math.random() - 0.5) * 0.25;
-                this.vy       = -(Math.random() * 0.4 + 0.1);
-                this.size     = Math.random() * 1.6 + 0.4;
-                this.baseAlpha = Math.random() * 0.35 + 0.05;
-                this.alpha    = this.baseAlpha;
-                this.life     = 0;
-                this.maxLife  = Math.random() * 300 + 200;
-                // Color: mostly warm parchment, occasional magenta
-                this.isMagenta = Math.random() < 0.12;
-            }
-
-            update() {
-                this.x  += this.vx;
-                this.y  += this.vy;
-                this.life++;
-
-                // Fade in/out
-                const progress = this.life / this.maxLife;
-                if (progress < 0.15) {
-                    this.alpha = this.baseAlpha * (progress / 0.15);
-                } else if (progress > 0.75) {
-                    this.alpha = this.baseAlpha * (1 - (progress - 0.75) / 0.25);
-                } else {
-                    this.alpha = this.baseAlpha;
-                }
-
-                if (this.life >= this.maxLife || this.y < -10) {
-                    this.reset();
-                }
-            }
-
-            draw() {
-                ctx.save();
-                ctx.globalAlpha = this.alpha;
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-
-                if (this.isMagenta) {
-                    ctx.fillStyle = `rgb(255, 20, 147)`;
-                    // Glow
-                    ctx.shadowColor = 'rgba(255, 20, 147, 0.8)';
-                    ctx.shadowBlur  = 10;
-                } else {
-                    ctx.fillStyle = `rgb(214, 201, 176)`;
-                }
-
-                ctx.fill();
-                ctx.restore();
-            }
-        }
-
-        const particles = Array.from({ length: PARTICLE_COUNT }, () => new Particle());
-
-        let rafId;
-        function animateParticles() {
-            ctx.clearRect(0, 0, W, H);
-            particles.forEach(p => { p.update(); p.draw(); });
-            rafId = requestAnimationFrame(animateParticles);
-        }
-        animateParticles();
-    }
-
-    // ── 5. Hero Mouse Parallax (rAF + Lerp) ───────────────────
+    // ── 4. Hero Overlay Entrance Animation ─────────────────────
     //
-    //  Each layer has data-depth attribute (0.02 = slow/far, 0.18 = fast/near)
-    //  Linear interpolation (lerp): current += (target - current) * factor
+    //  Fades in the text overlay elements on page load.
+    //  The video itself is frozen at frame 0 until scroll begins.
     //
-    const hero          = document.querySelector('.hero');
-    const parallaxLayers = document.querySelectorAll('[data-depth]');
+    const heroEntranceTl = gsap.timeline({ defaults: { ease: 'power3.out' }, delay: 0.3 });
 
-    // Separate lerp targets and currents per axis
-    let targetX = 0, targetY = 0;
-    const lerpStates = Array.from(parallaxLayers).map(() => ({ x: 0, y: 0 }));
-
-    const LERP_FACTOR = 0.06; // smoothness (lower = more lag)
-
-    if (hero && parallaxLayers.length && window.innerWidth > 900) {
-        hero.addEventListener('mousemove', (e) => {
-            const rect = hero.getBoundingClientRect();
-            // Normalize to [-1, 1] relative to hero center
-            targetX =  (e.clientX - rect.left  - rect.width  / 2) / (rect.width  / 2);
-            targetY =  (e.clientY - rect.top    - rect.height / 2) / (rect.height / 2);
-        }, { passive: true });
-
-        hero.addEventListener('mouseleave', () => {
-            targetX = 0;
-            targetY = 0;
-        });
-
-        (function parallaxRaf() {
-            parallaxLayers.forEach((layer, i) => {
-                const depth = parseFloat(layer.dataset.depth) || 0.1;
-                const state = lerpStates[i];
-
-                // Lerp each layer independently
-                state.x += (targetX - state.x) * LERP_FACTOR;
-                state.y += (targetY - state.y) * LERP_FACTOR;
-
-                const maxPixels = depth * 120; // scale depth to pixel movement
-                const moveX = state.x * maxPixels;
-                const moveY = state.y * maxPixels;
-
-                // GPU composite — always use translate3d, never top/left
-                layer.style.transform = `translate3d(${moveX}px, ${moveY}px, 0)`;
-            });
-
-            requestAnimationFrame(parallaxRaf);
-        })();
-    }
-
-    // ── 6. Hero Entrance Animation ─────────────────────────────
-    const heroTl = gsap.timeline({ defaults: { ease: 'power3.out' }, delay: 0.2 });
-
-    heroTl
-        // Fade in background glows
-        .to('.mid-glow', {
-            opacity: 1,
-            duration: 1.6,
-            stagger: 0.25
-        }, 0)
-
-        // Center app rises up
-        .to('#heroCenterApp', {
-            opacity: 1,
-            y: 0,
-            duration: 1.4,
-            ease: 'power4.out'
-        }, 0.2)
-
-        // Eyebrow
+    heroEntranceTl
+        // Eyebrow badge
         .to('.hero-eyebrow', {
             opacity: 1,
             y: 0,
             duration: 0.7
-        }, 0.5)
+        }, 0)
 
         // Main title
         .to('.hero-title', {
@@ -216,144 +72,87 @@ document.addEventListener('DOMContentLoaded', () => {
             y: 0,
             duration: 0.9,
             ease: 'power3.out'
-        }, 0.72)
+        }, 0.2)
 
         // Description
         .to('.hero-desc', {
             opacity: 1,
             y: 0,
             duration: 0.6
-        }, 1.0)
+        }, 0.5)
 
         // Buttons
         .to('.hero-actions', {
             opacity: 1,
             y: 0,
             duration: 0.6
-        }, 1.15)
-
-        // Character images (fade in after layout settles)
-        .to('.char-img', {
-            opacity: 1,
-            scale: 1,
-            duration: 1.2,
-            ease: 'power2.out',
-            stagger: 0.15
-        }, 0.8)
-
-        // Character badges
-        .to('.char-badge', {
-            opacity: 1,
-            y: 0,
-            duration: 0.7,
-            stagger: 0.15
-        }, 1.3)
+        }, 0.65)
 
         // Scroll hint
         .to('#heroScrollHint', {
             opacity: 1,
             duration: 0.8
-        }, 1.6);
+        }, 1.0);
 
-    // ── 7. Hero ScrollTrigger Scroll-Scrub + Character Fly-in ──
+    // ── 5. Kinetic Timepiece — Video Scroll Scrub ──────────────
     //
-    //  The hero is PINNED. As user scrolls:
-    //    - Characters fly inward from offscreen (x: ±340 → 0)
-    //    - Center app scales down & fades slightly
-    //    - Text content fades & moves up
-    //    - EXPLOSION fires at end of timeline (mix-blend-mode: screen)
+    //  The #hero section is PINNED for 200% of the viewport.
+    //  GSAP scrubs the video's currentTime from 0 → duration
+    //  as the user scrolls through the pinned zone.
+    //  The text overlay fades out early so the clock takes focus.
     //
-    const heroScrollTl = gsap.timeline({
-        scrollTrigger: {
-            trigger: '.hero',
-            start:   'top top',
-            end:     '+=180%',      // pinned distance: 1.8× viewport
-            pin:     true,
-            scrub:   1.5,            // lag factor for cinematic scrub
-            anticipatePin: 1,
+    const heroVideo = document.getElementById('hero-video');
+
+    function initVideoScrub() {
+        const duration = heroVideo.duration;
+        if (!duration || isNaN(duration)) return; // guard: metadata not yet ready
+
+        // Ensure video is paused — GSAP drives playback via currentTime
+        heroVideo.pause();
+        heroVideo.currentTime = 0;
+
+        // Proxy object that GSAP can tween (video.currentTime is not directly tweenable)
+        const videoProxy = { time: 0 };
+
+        const videoScrubTl = gsap.timeline({
+            scrollTrigger: {
+                trigger: '#hero',
+                start:   'top top',
+                end:     '+=200%',      // pin distance: 2× viewport height
+                pin:     true,
+                scrub:   1.5,           // cinematic lag factor
+                anticipatePin: 1,
+            }
+        });
+
+        videoScrubTl
+            // Phase 1 (0 → 60%): Scrub video from first frame to last
+            .to(videoProxy, {
+                time: duration,
+                ease: 'none',
+                duration: 0.7,
+                onUpdate() {
+                    heroVideo.currentTime = videoProxy.time;
+                }
+            }, 0)
+
+            // Phase 2 (0 → 35%): Fade out text overlay so clock takes full focus
+            .to('#heroVideoOverlay', {
+                opacity: 0,
+                y: -40,
+                ease: 'power2.in',
+                duration: 0.35
+            }, 0);
+    }
+
+    if (heroVideo) {
+        if (heroVideo.readyState >= 1) {
+            // Metadata already available (e.g. cached video)
+            initVideoScrub();
+        } else {
+            heroVideo.addEventListener('loadedmetadata', initVideoScrub, { once: true });
         }
-    });
-
-    heroScrollTl
-
-        // Phase 1 (progress 0 → 0.4): Characters fly in
-        .to('#layerCharLeft .char-left', {
-            x: 0,
-            ease: 'power2.inOut',
-            duration: 0.4
-        }, 0)
-
-        .to('#layerCharRight .char-right', {
-            x: 0,
-            ease: 'power2.inOut',
-            duration: 0.4
-        }, 0)
-
-        // Phase 2 (progress 0.2 → 0.55): Text lifts and fades
-        .to('.hero-title, .hero-desc, .hero-actions, .hero-eyebrow', {
-            y: -60,
-            opacity: 0,
-            ease: 'power2.in',
-            duration: 0.3
-        }, 0.25)
-
-        // Phase 2b: Center app shrinks slightly
-        .to('#heroCenterApp', {
-            scale: 0.88,
-            opacity: 0.6,
-            ease: 'power2.inOut',
-            duration: 0.35
-        }, 0.3)
-
-        // Phase 3 (progress 0.5 → 0.75): Characters converge to center
-        .to('#layerCharLeft .char-left', {
-            x: '38vw',
-            scale: 0.85,
-            ease: 'power3.inOut',
-            duration: 0.3
-        }, 0.45)
-
-        .to('#layerCharRight .char-right', {
-            x: '-38vw',
-            scale: 0.85,
-            ease: 'power3.inOut',
-            duration: 0.3
-        }, 0.45)
-
-        // Center app fades out
-        .to('#heroCenterApp', {
-            opacity: 0,
-            scale: 0.7,
-            ease: 'power3.in',
-            duration: 0.25
-        }, 0.6)
-
-        // EXPLOSION: appears with mix-blend-mode: screen
-        .to('#heroExplosion', {
-            opacity: 1,
-            ease: 'power2.out',
-            duration: 0.15
-        }, 0.72)
-
-        .to('.explosion-core', {
-            scale: 1,
-            ease: 'expo.out',
-            duration: 0.3
-        }, 0.73)
-
-        .to('.explosion-ring', {
-            scale: 1,
-            ease: 'expo.out',
-            stagger: 0.05,
-            duration: 0.3
-        }, 0.75)
-
-        // Final fade — everything dims as we leave hero
-        .to('.hero', {
-            opacity: 0.6,
-            ease: 'none',
-            duration: 0.2
-        }, 0.84);
+    }
 
     // ── 8. CTA Section: clip-path inset wipe animation ─────────
     //
@@ -642,5 +441,5 @@ document.addEventListener('DOMContentLoaded', () => {
         );
     });
 
-    console.log('%c🥧 Pie! — Renaissance Edition loaded', 'color: #FF1493; font-weight: bold; font-size: 14px;');
+    console.log('%c🕰️ Pie! — Kinetic Timepiece Edition loaded', 'color: #FF1493; font-weight: bold; font-size: 14px;');
 });
