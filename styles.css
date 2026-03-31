@@ -15,44 +15,47 @@
 
 /* ── Design Tokens ──────────────────────────────────────────── */
 :root {
-    /* Renaissance Earth Palette */
-    --earth-abyss:    #0c0a08;   /* Darkest oil base             */
-    --earth-deep:     #13110d;   /* Deep canvas brown-black       */
-    --earth-mid:      #1e1914;   /* Warm midtone canvas          */
-    --earth-card:     #251f18;   /* Slightly lighter card bg     */
-    --earth-surface:  #2e2620;   /* Card hover / elevated        */
-    --earth-umber:    #4a3d2e;   /* Raw umber accent neutral     */
-    --earth-sienna:   #7a5c3e;   /* Burnt sienna for accents     */
-    --earth-linen:    #d6c9b0;   /* Linen highlight text         */
-    --earth-parchment: #f0e8d5;  /* Primary text (warm white)    */
+    /* Minimalist B&W Palette */
+    --bg-base:        #FFFFFF;
+    --bg-alt:         #F5F5F7;
+    --text-main:      #000000;
+    --text-muted:     #86868B;
+    --accent:         #000000;
 
-    /* THE Aggressive Accent: Hot Magenta */
-    --magenta:        #FF1493;   /* Hot magenta CTA              */
-    --magenta-glow:   rgba(255, 20, 147, 0.35);
-    --magenta-soft:   rgba(255, 20, 147, 0.08);
-    --magenta-mid:    rgba(255, 20, 147, 0.18);
-    --magenta-hot:    #ff4db6;   /* Hover variant                */
+    /* Semantic mappings */
+    --earth-abyss:    var(--bg-base);
+    --earth-deep:     var(--bg-alt);
+    --earth-mid:      var(--bg-base);
+    --earth-card:     var(--bg-alt);
+    --earth-surface:  var(--bg-alt);
+    --earth-umber:    var(--text-muted);
+    --earth-sienna:   var(--text-muted);
+    --earth-linen:    var(--text-main);
+    --earth-parchment: var(--text-main);
 
-    /* Secondary warmth */
-    --ember:          #FF8C42;   /* Ember orange for streaks     */
-    --ember-glow:     rgba(255, 140, 66, 0.3);
-    --moss:           #7fb069;   /* Moss green for available     */
-    --moss-glow:      rgba(127, 176, 105, 0.25);
+    --magenta:        var(--accent);
+    --magenta-glow:   transparent;
+    --magenta-soft:   transparent;
+    --magenta-mid:    rgba(0,0,0,0.05);
+    --magenta-hot:    var(--accent);
 
-    /* Text hierarchy */
-    --text-bright:    #f0e8d5;   /* Parchment — primary          */
-    --text-warm:      #b5a48a;   /* Warm mid-tone secondary      */
-    --text-muted:     #6b5c47;   /* Muted umber                  */
+    --ember:          var(--text-main);
+    --ember-glow:     transparent;
+    --moss:           var(--text-main);
+    --moss-glow:      transparent;
 
-    /* Borders & surfaces */
-    --border:         rgba(214, 201, 176, 0.06);
-    --border-warm:    rgba(214, 201, 176, 0.12);
-    --border-magenta: rgba(255, 20, 147, 0.2);
+    --text-bright:    var(--text-main);
+    --text-warm:      var(--text-main);
+    --text-muted:     var(--text-muted);
+
+    --border:         rgba(0, 0, 0, 0.1);
+    --border-warm:    rgba(0, 0, 0, 0.15);
+    --border-magenta: var(--accent);
 
     /* Spacing & Shape */
-    --radius:         14px;
-    --radius-lg:      22px;
-    --radius-xl:      32px;
+    --radius:         2px;
+    --radius-lg:      2px;
+    --radius-xl:      2px;
     --max-w:          1200px;
     --nav-h:          72px;
 
@@ -72,7 +75,7 @@ html {
 }
 
 body {
-    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     background: var(--earth-abyss);
     color: var(--text-bright);
     line-height: 1.65;
@@ -158,7 +161,7 @@ body:has(button:hover) .cursor-ring {
     font-size: 10px;
     font-weight: 700;
     letter-spacing: 2px;
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Inter', sans-serif;
     min-width: 20px;
     transition: color 0.3s ease;
 }
@@ -166,7 +169,7 @@ body:has(button:hover) .cursor-ring {
 .side-nav-item .nav-line {
     width: 18px;
     height: 1px;
-    background: currentColor;
+    background: rgba(0,0,0,0.2);
     transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s ease;
     display: block;
 }
@@ -189,13 +192,13 @@ body:has(button:hover) .cursor-ring {
 }
 
 .side-nav-item.active {
-    color: var(--magenta);
+    color: #000000;
 }
 
 .side-nav-item.active .nav-line {
     width: 32px;
-    background: var(--magenta);
-    box-shadow: 0 0 8px var(--magenta-glow);
+    background: #000000;
+    box-shadow: none;
 }
 
 /* ── Top Navbar ─────────────────────────────────────────────── */
@@ -241,7 +244,7 @@ body:has(button:hover) .cursor-ring {
 }
 
 .logo-text {
-    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-family: 'Playfair Display', serif;
     font-size: 26px;
     font-weight: 700;
     letter-spacing: -0.5px;
@@ -286,22 +289,22 @@ body:has(button:hover) .cursor-ring {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    background: var(--magenta);
-    color: #fff;
+    background: transparent;
+    color: #000000;
     font-weight: 700;
     font-size: 13px;
     padding: 10px 22px;
-    border-radius: 100px;
+    border: 1px solid #000000;
+    border-radius: 2px;
     letter-spacing: 0.3px;
     transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-    box-shadow: 0 0 0 0 var(--magenta-glow);
     cursor: none;
 }
 
 .nav-cta:hover {
-    background: var(--magenta-hot);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 32px var(--magenta-glow);
+    background: #000000;
+    color: #FFFFFF;
+    transform: none;
 }
 
 /* ── Buttons ────────────────────────────────────────────────── */
@@ -309,36 +312,28 @@ body:has(button:hover) .cursor-ring {
     display: inline-flex;
     align-items: center;
     gap: 10px;
-    background: var(--magenta);
-    color: #fff;
+    background: transparent;
+    color: #000000;
     font-weight: 700;
     font-size: 15px;
     padding: 16px 34px;
-    border-radius: 100px;
+    border: 1px solid #000000;
+    border-radius: 2px;
     transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    box-shadow: 0 4px 30px var(--magenta-glow);
     cursor: none;
     position: relative;
     overflow: hidden;
     isolation: isolate;
 }
 
-.btn-primary::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.15) 100%);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    z-index: -1;
-}
+
 
 .btn-primary:hover {
-    transform: translateY(-3px) scale(1.02);
-    box-shadow: 0 16px 50px var(--magenta-glow);
+    transform: none;
+    background: #000000;
+    color: #FFFFFF;
 }
 
-.btn-primary:hover::before { opacity: 1; }
 
 .btn-xl { font-size: 17px; padding: 20px 48px; }
 
@@ -346,20 +341,20 @@ body:has(button:hover) .cursor-ring {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    color: var(--text-warm);
+    color: #000000;
     font-size: 14px;
     font-weight: 500;
     padding: 16px 28px;
-    border-radius: 100px;
-    border: 1px solid var(--border-warm);
+    border-radius: 2px;
+    border: 1px solid #000000;
     transition: all 0.35s ease;
     cursor: none;
 }
 
 .btn-ghost:hover {
-    color: var(--text-bright);
-    border-color: rgba(255, 20, 147, 0.3);
-    background: var(--magenta-soft);
+    color: #FFFFFF;
+    border-color: #000000;
+    background: #000000;
 }
 
 /* ── Section Layout Utilities ───────────────────────────────── */
@@ -402,7 +397,7 @@ body:has(button:hover) .cursor-ring {
 .section-header:not(.centered) .section-kicker::after { display: none; }
 
 .section-title {
-    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-family: 'Playfair Display', serif;
     font-size: var(--fs-h2);
     font-weight: 700;
     line-height: 1.1;
@@ -536,24 +531,25 @@ body:has(button:hover) .cursor-ring {
 }
 
 .serif-italic {
-    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-family: 'Playfair Display', serif;
     font-style: italic;
     font-weight: 600;
     font-size: var(--fs-hero);
-    color: var(--earth-linen);
+    color: #FFFFFF;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
     line-height: 1;
 }
 
 .hero-sub {
     font-size: calc(var(--fs-hero) * 0.55);
-    color: var(--text-warm);
+    color: #FFFFFF;
     margin-top: 12px;
     letter-spacing: -1px;
 }
 
 /* The Brand Name — Custom ligature feel */
 .hero-brand {
-    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-family: 'Playfair Display', serif;
     font-weight: 700;
     font-size: var(--fs-hero);
     line-height: 1;
@@ -564,16 +560,16 @@ body:has(button:hover) .cursor-ring {
 }
 
 .brand-pie {
-    color: var(--text-bright);
+    color: #FFFFFF;
     position: relative;
-    -webkit-text-stroke: 0.5px rgba(240, 232, 213, 0.3);
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    -webkit-text-stroke: none;
 }
 
 .brand-exclaim {
-    color: var(--magenta);
+    color: #FFFFFF;
     font-style: italic;
-    text-shadow: 0 0 40px var(--magenta-glow);
-    animation: exclamPulse 3s ease-in-out infinite;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
 }
 
 /* .ligature: combined 'ie!' glyph */
@@ -588,13 +584,13 @@ body:has(button:hover) .cursor-ring {
 
 .hero-desc {
     font-size: 16px;
-    color: var(--text-warm);
+    color: #FFFFFF;
     line-height: 1.8;
     max-width: 460px;
     margin-bottom: 40px;
     opacity: 0;
     transform: translateY(16px);
-    text-shadow: 0 1px 8px rgba(12, 10, 8, 0.8);
+    text-shadow: 0 2px 10px rgba(0,0,0,0.8);
 }
 
 .hero-actions {
@@ -725,7 +721,7 @@ body:has(button:hover) .cursor-ring {
 .feat-umber   { background: rgba(74, 61, 46, 0.3); color: var(--earth-linen); }
 
 .feature-card h3 {
-    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-family: 'Playfair Display', serif;
     font-size: 22px;
     font-weight: 700;
     color: var(--text-bright);
@@ -874,7 +870,7 @@ body:has(button:hover) .cursor-ring {
 }
 
 .manifesto-quote {
-    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-family: 'Playfair Display', serif;
     font-size: clamp(32px, 3.5vw, 52px);
     font-style: italic;
     font-weight: 700;
@@ -913,7 +909,7 @@ body:has(button:hover) .cursor-ring {
 }
 
 .stat-number {
-    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-family: 'Playfair Display', serif;
     font-size: clamp(48px, 5vw, 72px);
     font-weight: 700;
     color: var(--text-bright);
@@ -1012,7 +1008,7 @@ body:has(button:hover) .cursor-ring {
 }
 
 .platform-card h3 {
-    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-family: 'Playfair Display', serif;
     font-size: 24px;
     font-weight: 700;
     color: var(--text-bright);
@@ -1097,7 +1093,7 @@ body:has(button:hover) .cursor-ring {
 }
 
 .cta-headline {
-    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-family: 'Playfair Display', serif;
     font-size: clamp(52px, 6.5vw, 96px);
     font-weight: 700;
     line-height: 0.95;
@@ -1154,7 +1150,7 @@ body:has(button:hover) .cursor-ring {
 }
 
 .footer-logo span {
-    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-family: 'Playfair Display', serif;
     font-size: 22px;
     font-weight: 700;
     color: var(--text-warm);
