@@ -24,7 +24,7 @@
 
     <!-- ═══ Vertical Scrollspy Nav ═══ -->
     <nav class="side-nav" aria-label="Section navigation" id="sideNav">
-        <a href="#hero" class="side-nav-item active" data-target="hero">
+        <a href="#cinematic-hero" class="side-nav-item active" data-target="cinematic-hero">
             <span class="nav-num">01</span>
             <span class="nav-line"></span>
             <span class="nav-label">Clock</span>
@@ -59,7 +59,7 @@
     <!-- ═══ Top Navbar ═══ -->
     <nav class="navbar" id="topNav">
         <div class="nav-inner">
-            <a href="#hero" class="nav-logo">
+            <a href="#cinematic-hero" class="nav-logo">
                 <img src="app_icon.png" alt="Pie App Icon" width="34" height="34">
                 <span class="logo-text">Pie<span class="logo-exclaim">!</span></span>
             </a>
@@ -75,13 +75,14 @@
         </div>
     </nav>
 
-    <!-- ═══ HERO SECTION — Kinetic Timepiece Video Scrub ═══ -->
-    <section class="hero" id="hero" data-section>
+    <!-- ═══ CINEMATIC HERO SECTION — Dual Video Match-Cut ═══ -->
+    <section id="cinematic-hero" data-section>
 
-        <!-- Scrub video: clock animation driven by scroll -->
-        <video id="hero-video" src="./clock-new-optimized.mp4" muted playsinline preload="auto"></video>
+        <!-- Stacked scroll-scrubbed videos -->
+        <video id="vid-forge" src="./clock-forge-optimized.mp4" muted playsinline preload="auto"></video>
+        <video id="vid-celestial" src="./celestial-command-optimized.mp4" muted playsinline preload="auto"></video>
 
-        <!-- Text overlay sits above the video -->
+        <!-- Text overlay sits above the videos -->
         <div class="hero-video-overlay" id="heroVideoOverlay">
             <div class="hero-eyebrow">
                 <span class="eyebrow-line"></span>

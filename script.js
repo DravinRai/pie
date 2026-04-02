@@ -94,65 +94,82 @@ document.addEventListener('DOMContentLoaded', () => {
             duration: 0.8
         }, 1.0);
 
-    // ── 5. Kinetic Timepiece — Video Scroll Scrub ──────────────
+    // ── 5. Cinematic Hero — Dual Video Match-Cut Scrub ────────
     //
-    //  The #hero section is PINNED for 200% of the viewport.
-    //  GSAP scrubs the video's currentTime from 0 → duration
-    //  as the user scrolls through the pinned zone.
-    //  The text overlay fades out early so the clock takes focus.
+    //  The #cinematic-hero is PINNED for 400% of the viewport.
+    //  We scrub vid-forge (0-50% timeline) then vid-celestial (50-100%).
+    //  The match-cut happens at exactly 50% via a set() call.
     //
-    const heroVideo = document.getElementById('hero-video');
+    const vidForge     = document.getElementById('vid-forge');
+    const vidCelestial = document.getElementById('vid-celestial');
 
-    function initVideoScrub() {
-        const duration = heroVideo.duration;
-        if (!duration || isNaN(duration)) return; // guard: metadata not yet ready
+    function initCinematicHero() {
+        const d1 = vidForge.duration;
+        const d2 = vidCelestial.duration;
 
-        // Ensure video is paused — GSAP drives playback via currentTime
-        heroVideo.pause();
-        heroVideo.currentTime = 0;
+        if (!d1 || isNaN(d1) || !d2 || isNaN(d2)) return;
 
-        // Proxy object that GSAP can tween (video.currentTime is not directly tweenable)
-        const videoProxy = { time: 0 };
+        // Ensure both videos are paused — GSAP drives playback
+        vidForge.pause();
+        vidCelestial.pause();
+        vidForge.currentTime = 0;
+        vidCelestial.currentTime = 0;
 
-        const videoScrubTl = gsap.timeline({
+        // Proxy objects for tweening currentTime
+        const proxy = { time1: 0, time2: 0 };
+
+        const masterTl = gsap.timeline({
             scrollTrigger: {
-                trigger: '#hero',
+                trigger: '#cinematic-hero',
                 start:   'top top',
-                end:     '+=200%',      // pin distance: 2× viewport height
+                end:     '+=400%',      // massive scroll distance
                 pin:     true,
-                scrub:   1.5,           // cinematic lag factor
+                scrub:   1.5,           // cinematic lag
                 anticipatePin: 1,
             }
         });
 
-        videoScrubTl
-            // Phase 1 (0 → 60%): Scrub video from first frame to last
-            .to(videoProxy, {
-                time: duration,
+        masterTl
+            // --- Phase 1: Forge Video (0% → 50% of timeline) ---
+            .to(proxy, {
+                time1: d1,
+                duration: 0.5,
                 ease: 'none',
-                duration: 0.7,
-                onUpdate() {
-                    heroVideo.currentTime = videoProxy.time;
-                }
+                onUpdate: () => { vidForge.currentTime = proxy.time1; }
             }, 0)
 
-            // Phase 2 (0 → 35%): Fade out text overlay so clock takes full focus
+            // --- Phase 2: The Match-Cut (Exact 50% mark) ---
+            .set(vidForge,     { opacity: 0 }, 0.5)
+            .set(vidCelestial, { opacity: 1 }, 0.5)
+
+            // --- Phase 3: Celestial Video (50% → 100% of timeline) ---
+            .to(proxy, {
+                time2: d2,
+                duration: 0.5,
+                ease: 'none',
+                onUpdate: () => { vidCelestial.currentTime = proxy.time2; }
+            }, 0.5)
+
+            // --- Overlay Fade (0% → 20% of timeline) ---
             .to('#heroVideoOverlay', {
                 opacity: 0,
                 y: -40,
                 ease: 'power2.in',
-                duration: 0.35
+                duration: 0.2
             }, 0);
     }
 
-    if (heroVideo) {
-        if (heroVideo.readyState >= 1) {
-            // Metadata already available (e.g. cached video)
-            initVideoScrub();
-        } else {
-            heroVideo.addEventListener('loadedmetadata', initVideoScrub, { once: true });
-        }
-    }
+    // Wait for BOTH metadata loads
+    let loadedCount = 0;
+    const checkLoaded = () => {
+        loadedCount++;
+        if (loadedCount === 2) initCinematicHero();
+    };
+
+    [vidForge, vidCelestial].forEach(vid => {
+        if (vid.readyState >= 1) checkLoaded();
+        else vid.addEventListener('loadedmetadata', checkLoaded, { once: true });
+    });
 
     // ── 8. CTA Section: clip-path inset wipe animation ─────────
     //
@@ -309,7 +326,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Account for pinned hero: if targeting a section below hero,
             // we need to scroll past the pin trigger + pin distance
-            const heroSection = document.getElementById('hero');
+            const heroSection = document.getElementById('cinematic-hero');
             const heroTrigger = ScrollTrigger.getById
                 ? null
                 : ScrollTrigger.getAll().find(t => t.trigger === heroSection);
@@ -322,15 +339,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 duration: 1.1,
                 ease: 'power3.inOut',
                 onStart() {
-                    // gsap ScrollTo plugin not loaded — fallback
+                    // if gsap ScrollTo plugin not loaded — fallback
                     if (typeof gsap.to === 'undefined') {
                         window.scrollTo({ top: y, behavior: 'smooth' });
                     }
                 }
             });
-
-            // Plain fallback
-            window.scrollTo({ top: y, behavior: 'smooth' });
         });
     });
 

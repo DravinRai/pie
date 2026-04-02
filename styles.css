@@ -431,29 +431,35 @@ body:has(button:hover) .cursor-ring {
 }
 
 /* ── ═══════════════════════════════════════════════ ── */
-/* ──         HERO — KINETIC TIMEPIECE SCRUB          ── */
+/* ──         CINEMATIC HERO — MATCH-CUT SCRUB         ── */
 /* ── ═══════════════════════════════════════════════ ── */
-.hero {
-    position: relative;
+#cinematic-hero {
+    width: 100vw;
     height: 100vh;
     overflow: hidden;
+    position: relative;
+    background: #000;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--earth-abyss);
 }
 
-/* Scrub video fills the viewport */
-#hero-video {
+/* Both videos are stacked on top of each other */
+#vid-forge,
+#vid-celestial {
     position: absolute;
     top: 0;
     left: 0;
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
     object-fit: cover;
-    z-index: 1;
     pointer-events: none;
-    will-change: auto;
+    will-change: opacity;
+}
+
+/* Initial state: Forge visible, Celestial hidden */
+#vid-celestial {
+    opacity: 0;
 }
 
 /* Text overlay — sits above the video */
