@@ -1,357 +1,2019 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pie! — Visual Time Blocking & Habit Tracker</title>
-    <meta name="description" content="Plan your day visually with Pie. A clock-based task manager that turns your schedule into a beautiful pie chart. Track streaks, build habits, stay masterful.">
-    <meta property="og:title" content="Pie! — Own Every Slice of Your Day">
-    <meta property="og:description" content="Visual time blocking, streak tracking, and habit mastery — crafted for the modern renaissance person.">
-    <link rel="icon" type="image/png" href="app_icon.png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pie! — Own Every Slice of Your Day</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Barlow+Condensed:wght@700;800;900&display=swap');
 
-    <!-- Fonts: Playfair Display (Serif) + Inter (Clean Modern) -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-    <link rel="stylesheet" href="styles.css">
+    :root {
+      --black: #0a0a0a;
+      --white: #f0ede8;
+      --accent: #e8632a;
+      --accent-glow: #ff7a3d;
+      --gray: #888;
+      --light-gray: #1a1a1a;
+    }
+
+    html { scroll-behavior: auto; }
+
+    body {
+      background: var(--black);
+      color: var(--white);
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 24px 48px;
+    }
+
+    nav::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 180px;
+      background: linear-gradient(to bottom, rgba(10,10,10,1) 10%, rgba(10,10,10,0.8) 50%, transparent 100%);
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    .nav-logo {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: 14px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--white);
+      opacity: 0.9;
+      cursor: pointer;
+    }
+
+    .nav-right {
+      display: flex;
+      gap: 32px;
+      align-items: center;
+    }
+
+    .nav-right a {
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--white);
+      text-decoration: none;
+      opacity: 0.6;
+      transition: opacity 0.3s;
+    }
+
+    .nav-right a:hover { opacity: 1; }
+    .nav-right a.nav-active { opacity: 1; color: var(--accent); }
+
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 4px;
+      background: none;
+      border: none;
+      z-index: 200;
+    }
+
+    .hamburger span {
+      display: block;
+      width: 22px;
+      height: 1.5px;
+      background: var(--white);
+      transition: transform 0.35s cubic-bezier(0.16,1,0.3,1), opacity 0.25s;
+      transform-origin: center;
+    }
+
+    .hamburger.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .hamburger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+    @media (max-width: 768px) {
+      nav { padding: 20px 24px; }
+      .hamburger { display: flex; }
+
+      #section-hero {
+        padding: 0 24px 60px;
+        align-items: flex-start;
+        min-height: 100svh;
+        flex-direction: column;
+        justify-content: flex-end;
+      }
+
+      .hero-headline { font-size: clamp(80px, 28vw, 160px); text-align: left; }
+      .hero-sub { display: none !important; }
+
+      .nav-right {
+        position: fixed;
+        top: 0; right: 0;
+        height: 100vh;
+        width: 260px;
+        background: rgba(10,10,10,0.97);
+        border-left: 1px solid rgba(240,237,232,0.08);
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 80px 40px 40px;
+        gap: 28px;
+        transform: translateX(100%);
+        transition: transform 0.4s cubic-bezier(0.16,1,0.3,1);
+        z-index: 150;
+        pointer-events: none;
+      }
+
+      .nav-right.mobile-open { transform: translateX(0); pointer-events: all; }
+      .nav-right a { font-size: 13px; letter-spacing: 0.18em; opacity: 0.7; }
+      .nav-cta { margin-top: 12px; padding: 10px 24px; }
+    }
+
+    .nav-cta {
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      border: 1px solid rgba(240,237,232,0.3);
+      padding: 8px 20px;
+      color: var(--white) !important;
+      opacity: 1 !important;
+      transition: background 0.3s, border-color 0.3s !important;
+    }
+
+    .nav-cta:hover { background: var(--accent); border-color: var(--accent); color: var(--black) !important; }
+
+    /* CANVAS */
+    #canvas-wrapper {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100vh;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    #vignette-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 2;
+      pointer-events: none;
+      background: radial-gradient(
+        ellipse 75% 65% at 50% 60%,
+        transparent 40%,
+        rgba(10,10,10,0.35) 62%,
+        rgba(10,10,10,0.75) 82%,
+        #0a0a0a 100%
+      );
+    }
+
+    #three-canvas { width: 100%; height: 100%; display: block; }
+
+    /* SCROLL CONTAINER */
+    #scroll-container {
+      position: relative;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    .section {
+      min-height: 110vh;
+      display: flex;
+      align-items: flex-end;
+      padding: 0 48px 80px;
+      pointer-events: none;
+      position: relative;
+    }
+
+    #section-hero { align-items: flex-end; min-height: 100vh; }
+    #section-cta { min-height: 100vh; }
+
+    /* HERO */
+    .hero-headline {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: clamp(64px, 13vw, 200px);
+      line-height: 0.88;
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+      color: var(--white);
+      user-select: none;
+    }
+
+    .hero-headline .line { display: block; }
+    .hero-headline .stroke {
+      -webkit-text-stroke: 1px var(--white);
+      color: transparent;
+    }
+
+    .hero-sub {
+      position: absolute;
+      right: 48px;
+      bottom: 80px;
+      text-align: right;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0;
+    }
+
+    .hero-sub p {
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gray);
+      line-height: 2;
+    }
+
+    .hero-sub .year {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      color: var(--accent);
+    }
+
+    .scroll-indicator {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 10px;
+      pointer-events: none;
+      margin-top: 20px;
+    }
+
+    .scroll-indicator span {
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gray);
+    }
+
+    .scroll-line {
+      width: 40px;
+      height: 1px;
+      background: linear-gradient(to left, var(--accent), transparent);
+      animation: scrollPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes scrollPulse {
+      0%, 100% { opacity: 0.4; transform: scaleX(1); }
+      50% { opacity: 1; transform: scaleX(1.2); }
+    }
+
+    /* LOAD-IN ANIMATIONS */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(28px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(24px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    nav .nav-logo { animation: fadeDown 0.7s cubic-bezier(0.16,1,0.3,1) 0.2s both; }
+
+    @media (min-width: 769px) {
+      nav .nav-right { animation: fadeDown 0.7s cubic-bezier(0.16,1,0.3,1) 0.35s both; }
+    }
+
+    .hero-headline .line:nth-child(1) { animation: fadeUp 0.9s cubic-bezier(0.16,1,0.3,1) 0.55s both; }
+    .hero-headline .line:nth-child(2) { animation: fadeUp 0.9s cubic-bezier(0.16,1,0.3,1) 0.72s both; }
+    .hero-sub { animation: slideInRight 0.8s cubic-bezier(0.16,1,0.3,1) 0.95s both; }
+    .scroll-indicator { animation: fadeIn 0.8s ease 1.3s both; }
+
+    @media (prefers-reduced-motion: reduce) {
+      nav .nav-logo, nav .nav-right,
+      .hero-headline .line, .hero-sub, .scroll-indicator { animation: none; }
+    }
+
+    /* OVERVIEW */
+    #section-overview { align-items: center; }
+    .section-tag {
+      font-size: 10px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .section-tag::before {
+      content: '';
+      width: 24px;
+      height: 1px;
+      background: var(--accent);
+    }
+
+    .overview-content { max-width: 480px; }
+
+    .section-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(40px, 6vw, 80px);
+      font-weight: 800;
+      text-transform: uppercase;
+      line-height: 0.92;
+      letter-spacing: -0.01em;
+      margin-bottom: 32px;
+    }
+
+    .section-body {
+      font-size: 14px;
+      line-height: 1.8;
+      color: rgba(240,237,232,0.55);
+      max-width: 380px;
+      margin-bottom: 40px;
+    }
+
+    .stat-row {
+      display: flex;
+      gap: 40px;
+      margin-top: 40px;
+      padding-top: 40px;
+      border-top: 1px solid rgba(240,237,232,0.08);
+    }
+
+    .stat { display: flex; flex-direction: column; gap: 4px; }
+
+    .stat-val {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 36px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--white);
+    }
+
+    .stat-label {
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--gray);
+    }
+
+    /* SPECS */
+    #section-specs { align-items: center; justify-content: flex-end; }
+    .specs-content { max-width: 500px; text-align: right; }
+    .specs-list { list-style: none; margin-top: 32px; }
+
+    .specs-list li {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 16px 0;
+      border-bottom: 1px solid rgba(240,237,232,0.06);
+      gap: 40px;
+    }
+
+    .spec-name {
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gray);
+    }
+
+    .spec-val {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: var(--white);
+    }
+
+    /* FEATURES */
+    #section-features { align-items: flex-end; min-height: 100vh; }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px;
+      max-width: 520px;
+      margin-top: 40px;
+    }
+
+    .feature-item {
+      background: rgba(6,6,6,0.72);
+      border: 1px solid rgba(240,237,232,0.06);
+      padding: 28px 24px;
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+
+    .feature-num {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+
+    .feature-name {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+      margin-bottom: 8px;
+    }
+
+    .feature-desc {
+      font-size: 11px;
+      line-height: 1.7;
+      color: rgba(240,237,232,0.45);
+    }
+
+    /* QUOTE */
+    #section-quote {
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      flex-direction: column;
+    }
+
+    .quote-mark {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 120px;
+      line-height: 0.6;
+      color: var(--accent);
+      opacity: 0.3;
+      margin-bottom: 16px;
+    }
+
+    .quote-text {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(28px, 4vw, 52px);
+      font-weight: 700;
+      text-transform: uppercase;
+      line-height: 1.1;
+      letter-spacing: -0.01em;
+      max-width: 800px;
+      margin: 0 auto 32px;
+    }
+
+    .quote-attr {
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gray);
+    }
+
+    .quote-attr strong { color: var(--accent); font-weight: 500; }
+
+    /* CTA */
+    #section-cta { align-items: flex-end; }
+    .cta-content { width: 100%; }
+
+    .cta-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .cta-label::before { content: ''; width: 24px; height: 1px; background: var(--accent); }
+
+    .cta-headline {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 900;
+      font-size: clamp(60px, 12vw, 160px);
+      line-height: 0.88;
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+      margin-bottom: 48px;
+    }
+
+    .cta-headline .stroke { -webkit-text-stroke: 1px var(--white); color: transparent; }
+
+    .cta-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      border-top: 1px solid rgba(240,237,232,0.1);
+      padding-top: 32px;
+    }
+
+    .cta-btns { display: flex; gap: 12px; flex-wrap: wrap; pointer-events: all; }
+
+    .cta-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--accent);
+      color: var(--black);
+      text-decoration: none;
+      padding: 18px 36px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      transition: transform 0.3s, background 0.3s;
+    }
+
+    .cta-btn:hover { background: var(--white); transform: translateY(-2px); }
+
+    .cta-btn-secondary {
+      background: transparent;
+      color: var(--white);
+      border: 1px solid rgba(240,237,232,0.3);
+    }
+
+    .cta-btn-secondary:hover { background: rgba(240,237,232,0.1); color: var(--white); transform: translateY(-2px); }
+
+    .cta-btn svg { transition: transform 0.3s; }
+    .cta-btn:hover svg { transform: translateX(4px); }
+
+    .footer-copy {
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(240,237,232,0.3);
+      text-align: right;
+      line-height: 2;
+    }
+
+    /* DRAG HINT */
+    #drag-hint {
+      position: fixed;
+      bottom: 32px;
+      right: 48px;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      opacity: 0;
+      transition: opacity 0.6s;
+      pointer-events: none;
+    }
+
+    #drag-hint.visible { opacity: 1; }
+    #drag-hint svg { opacity: 0.5; }
+
+    #drag-hint span {
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gray);
+    }
+
+    /* SIDE TOGGLES */
+    #side-toggles {
+      position: fixed;
+      top: 50%;
+      right: 0;
+      transform: translateY(-50%);
+      z-index: 1001;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      pointer-events: all;
+    }
+
+    #side-toggles.open { right: 340px; }
+
+    .side-btn {
+      background: rgba(10,10,10,0.9);
+      border: 1px solid rgba(240,237,232,0.12);
+      border-right: none;
+      color: var(--accent);
+      cursor: pointer;
+      padding: 14px 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.2s;
+      pointer-events: all;
+      border-bottom: none;
+    }
+
+    .side-btn:last-child { border-bottom: 1px solid rgba(240,237,232,0.12); }
+    .side-btn:hover { background: rgba(232,99,42,0.12); }
+    .side-btn.active-panel { background: rgba(232,99,42,0.18); border-left-color: var(--accent); }
+
+    .side-btn svg { display: block; }
+
+    .side-btn span {
+      font-size: 8px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent);
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+    }
+
+    /* SETTINGS PANEL */
+    #settings-panel {
+      position: fixed;
+      top: 0; right: 0;
+      height: 100vh;
+      width: 340px;
+      background: rgba(10,10,10,0.96);
+      border-left: 1px solid rgba(240,237,232,0.08);
+      z-index: 1000;
+      transform: translateX(100%);
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+      font-family: 'Inter', sans-serif;
+      pointer-events: all;
+    }
+
+    #settings-panel.open { transform: translateX(0); }
+
+    .settings-header {
+      padding: 24px 24px 16px;
+      border-bottom: 1px solid rgba(240,237,232,0.07);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .settings-header h3 {
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--white);
+      font-weight: 500;
+    }
+
+    .settings-header p {
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      color: var(--gray);
+      margin-top: 4px;
+    }
+
+    .settings-section-tabs {
+      display: flex;
+      padding: 12px 16px;
+      gap: 4px;
+      border-bottom: 1px solid rgba(240,237,232,0.07);
+      flex-wrap: wrap;
+      flex-shrink: 0;
+    }
+
+    .tab-btn {
+      padding: 5px 10px;
+      font-size: 9px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      background: transparent;
+      border: 1px solid rgba(240,237,232,0.1);
+      color: var(--gray);
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .tab-btn.active { background: var(--accent); border-color: var(--accent); color: var(--black); }
+
+    .settings-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px 24px;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(232,99,42,0.3) transparent;
+    }
+
+    .settings-body::-webkit-scrollbar { width: 4px; }
+    .settings-body::-webkit-scrollbar-thumb { background: rgba(232,99,42,0.3); border-radius: 2px; }
+
+    .ctrl-group { margin-bottom: 20px; }
+
+    .ctrl-label {
+      font-size: 10px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gray);
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .ctrl-label span {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 0;
+    }
+
+    .ctrl-slider {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 2px;
+      background: rgba(240,237,232,0.1);
+      outline: none;
+      cursor: pointer;
+      border-radius: 1px;
+    }
+
+    .ctrl-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .ctrl-slider::-webkit-slider-thumb:hover { transform: scale(1.4); }
+
+    .ctrl-slider::-moz-range-thumb {
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+      border: none;
+    }
+
+    .settings-footer {
+      padding: 16px 24px;
+      border-top: 1px solid rgba(240,237,232,0.07);
+      display: flex;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .settings-btn {
+      flex: 1;
+      padding: 10px;
+      font-size: 9px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.2s;
+    }
+
+    .settings-btn-reset {
+      background: transparent;
+      border: 1px solid rgba(240,237,232,0.15);
+      color: var(--gray);
+    }
+
+    .settings-btn-reset:hover { border-color: var(--white); color: var(--white); }
+
+    .settings-btn-apply {
+      background: var(--accent);
+      border: 1px solid var(--accent);
+      color: var(--black);
+      font-weight: 600;
+    }
+
+    .settings-btn-apply:hover { background: var(--white); border-color: var(--white); }
+
+    .section-name-badge {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 20px;
+      font-weight: 800;
+      text-transform: uppercase;
+      color: var(--white);
+      letter-spacing: 0.02em;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(232,99,42,0.2);
+    }
+
+    /* PROGRESS BAR */
+    .scroll-progress {
+      position: fixed;
+      top: 0; left: 0;
+      height: 2px;
+      background: linear-gradient(to right, var(--accent), var(--accent-glow));
+      z-index: 200;
+      transition: width 0.1s linear;
+      width: 0%;
+      box-shadow: 0 0 8px rgba(232,99,42,0.6);
+    }
+
+    /* ═══ TEXT REVEAL SCROLL ANIMATIONS ═══ */
+
+    /* Clip-path reveal for big headlines */
+    .reveal-word {
+      display: inline-block;
+      overflow: hidden;
+      vertical-align: bottom;
+      line-height: 1.05;
+    }
+
+    .reveal-word-inner {
+      display: inline-block;
+      transform: translateY(110%);
+      opacity: 0;
+      transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1),
+                  opacity 0.5s ease;
+    }
+
+    .reveal-word.is-visible .reveal-word-inner {
+      transform: translateY(0%);
+      opacity: 1;
+    }
+
+    /* Staggered word reveals */
+    .reveal-word:nth-child(1) .reveal-word-inner { transition-delay: 0.0s; }
+    .reveal-word:nth-child(2) .reveal-word-inner { transition-delay: 0.12s; }
+    .reveal-word:nth-child(3) .reveal-word-inner { transition-delay: 0.22s; }
+    .reveal-word:nth-child(4) .reveal-word-inner { transition-delay: 0.32s; }
+
+    /* Fade-up for body text, stats, spec rows */
+    .reveal-fade {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.16,1,0.3,1);
+    }
+
+    .reveal-fade.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Stagger for .reveal-fade siblings */
+    .reveal-fade:nth-child(1) { transition-delay: 0.05s; }
+    .reveal-fade:nth-child(2) { transition-delay: 0.15s; }
+    .reveal-fade:nth-child(3) { transition-delay: 0.25s; }
+    .reveal-fade:nth-child(4) { transition-delay: 0.35s; }
+    .reveal-fade:nth-child(5) { transition-delay: 0.45s; }
+    .reveal-fade:nth-child(6) { transition-delay: 0.55s; }
+    .reveal-fade:nth-child(7) { transition-delay: 0.65s; }
+
+    /* Horizontal line wipe for section tags / dividers */
+    .reveal-line {
+      clip-path: inset(0 100% 0 0);
+      transition: clip-path 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s;
+    }
+
+    .reveal-line.is-visible {
+      clip-path: inset(0 0% 0 0);
+    }
+
+    /* Counter number count-up shimmer */
+    .stat-val {
+      transition: color 0.4s;
+    }
+
+    .stat.is-visible .stat-val {
+      color: var(--white);
+    }
+
+    /* Feature cards slide-up with stagger */
+    .feature-item {
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity 0.65s ease, transform 0.65s cubic-bezier(0.16,1,0.3,1);
+    }
+
+    .feature-item.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .feature-item:nth-child(1) { transition-delay: 0.0s; }
+    .feature-item:nth-child(2) { transition-delay: 0.10s; }
+    .feature-item:nth-child(3) { transition-delay: 0.20s; }
+    .feature-item:nth-child(4) { transition-delay: 0.30s; }
+
+    /* Spec list rows swipe in from right */
+    .specs-list li {
+      opacity: 0;
+      transform: translateX(20px);
+      transition: opacity 0.55s ease, transform 0.55s cubic-bezier(0.16,1,0.3,1);
+    }
+
+    .specs-list.is-visible li {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .specs-list.is-visible li:nth-child(1) { transition-delay: 0.05s; }
+    .specs-list.is-visible li:nth-child(2) { transition-delay: 0.12s; }
+    .specs-list.is-visible li:nth-child(3) { transition-delay: 0.19s; }
+    .specs-list.is-visible li:nth-child(4) { transition-delay: 0.26s; }
+    .specs-list.is-visible li:nth-child(5) { transition-delay: 0.33s; }
+    .specs-list.is-visible li:nth-child(6) { transition-delay: 0.40s; }
+    .specs-list.is-visible li:nth-child(7) { transition-delay: 0.47s; }
+
+    /* Quote char-by-char shimmer (applied via JS) */
+    .quote-char {
+      display: inline-block;
+      opacity: 0;
+      transform: translateY(16px);
+      transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.16,1,0.3,1);
+    }
+
+    .quote-char.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* SCENE PANEL */
+    #scene-panel {
+      position:fixed; top:0; right:0; height:100vh; width:340px;
+      background:rgba(10,10,10,0.96); border-left:1px solid rgba(240,237,232,0.08);
+      z-index:999; transform:translateX(100%);
+      transition:transform 0.4s cubic-bezier(0.16,1,0.3,1);
+      display:flex; flex-direction:column; font-family:'Inter',sans-serif; pointer-events:all;
+    }
+  </style>
 </head>
 <body>
 
-    <!-- ═══ Cursor Glow ═══ -->
-    <div class="cursor-dot" id="cursorDot"></div>
-    <div class="cursor-ring" id="cursorRing"></div>
+  <div class="scroll-progress" id="progress-bar"></div>
 
-    <!-- ═══ Vertical Scrollspy Nav ═══ -->
-    <nav class="side-nav" aria-label="Section navigation" id="sideNav">
-        <a href="#cinematic-hero" class="side-nav-item active" data-target="cinematic-hero">
-            <span class="nav-num">01</span>
-            <span class="nav-line"></span>
-            <span class="nav-label">Clock</span>
-        </a>
-        <a href="#features" class="side-nav-item" data-target="features">
-            <span class="nav-num">02</span>
-            <span class="nav-line"></span>
-            <span class="nav-label">Features</span>
-        </a>
-        <a href="#screenshots" class="side-nav-item" data-target="screenshots">
-            <span class="nav-num">03</span>
-            <span class="nav-line"></span>
-            <span class="nav-label">Gallery</span>
-        </a>
-        <a href="#manifesto" class="side-nav-item" data-target="manifesto">
-            <span class="nav-num">04</span>
-            <span class="nav-line"></span>
-            <span class="nav-label">Manifesto</span>
-        </a>
-        <a href="#platforms" class="side-nav-item" data-target="platforms">
-            <span class="nav-num">05</span>
-            <span class="nav-line"></span>
-            <span class="nav-label">Platforms</span>
-        </a>
-        <a href="#download" class="side-nav-item" data-target="download">
-            <span class="nav-num">06</span>
-            <span class="nav-line"></span>
-            <span class="nav-label">Download</span>
-        </a>
-    </nav>
+  <!-- NAV -->
+  <nav>
+    <div class="nav-logo" onclick="window.scrollTo({top:0,behavior:'smooth'})">Pie! — Time. Owned.</div>
+    <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+    <div class="nav-right" id="nav-right">
+      <a href="#" data-nav-section="section-overview" onclick="scrollToSection('section-overview');return false;">Overview</a>
+      <a href="#" data-nav-section="section-specs" onclick="scrollToSection('section-specs');return false;">Features</a>
+      <a href="#" data-nav-section="section-features" onclick="scrollToSection('section-features');return false;">Design</a>
+      <a href="#" data-nav-section="section-quote" onclick="scrollToSection('section-quote');return false;">Press</a>
+      <a href="#" class="nav-cta" data-nav-section="section-cta" onclick="scrollToSection('section-cta');return false;">Download</a>
+    </div>
+  </nav>
 
-    <!-- ═══ Top Navbar ═══ -->
-    <nav class="navbar" id="topNav">
-        <div class="nav-inner">
-            <a href="#cinematic-hero" class="nav-logo">
-                <img src="app_icon.png" alt="Pie App Icon" width="34" height="34">
-                <span class="logo-text">Pie<span class="logo-exclaim">!</span></span>
+  <!-- DRAG HINT -->
+  <div id="drag-hint">
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+      <path d="M4 9h10M4 9l3-3M4 9l3 3M14 9l-3-3M14 9l-3 3" stroke="#888" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span>Drag to rotate</span>
+  </div>
+
+  <!-- SIDE TOGGLES -->
+  <div id="side-toggles">
+    <button class="side-btn" id="scene-toggle" title="Scene Settings">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M1 12l4-5 3 3 3-4 4 6H1z" stroke="#e8632a" stroke-width="1.2" stroke-linejoin="round"/>
+        <circle cx="11.5" cy="4.5" r="1.5" stroke="#e8632a" stroke-width="1.2"/>
+      </svg>
+      <span>Scene</span>
+    </button>
+    <button class="side-btn" id="settings-toggle" title="Camera Settings">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <circle cx="8" cy="8" r="2.5" stroke="#e8632a" stroke-width="1.2"/>
+        <path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.05 3.05l1.41 1.41M11.54 11.54l1.41 1.41M3.05 12.95l1.41-1.41M11.54 4.46l1.41-1.41" stroke="#e8632a" stroke-width="1.2" stroke-linecap="round"/>
+      </svg>
+      <span>Cam</span>
+    </button>
+  </div>
+
+  <!-- SCENE SETTINGS PANEL -->
+  <div id="scene-panel">
+    <div class="settings-header">
+      <div>
+        <h3>Scene Settings</h3>
+        <p>Lighting &amp; clock material controls</p>
+      </div>
+    </div>
+    <div class="settings-body" id="scene-body" style="flex:1;overflow-y:auto;padding:20px 24px;scrollbar-width:thin;scrollbar-color:rgba(232,99,42,0.3) transparent;"></div>
+    <div class="settings-footer">
+      <button class="settings-btn settings-btn-reset" id="btn-scene-reset">Reset All</button>
+      <button class="settings-btn settings-btn-apply" id="btn-scene-export">Copy Values</button>
+    </div>
+  </div>
+
+  <!-- CAMERA SETTINGS PANEL -->
+  <div id="settings-panel">
+    <div class="settings-header">
+      <div>
+        <h3>Camera Settings</h3>
+        <p>Per-section keyframe editor</p>
+      </div>
+    </div>
+    <div class="settings-section-tabs" id="settings-tabs"></div>
+    <div class="settings-body" id="settings-body"></div>
+    <div class="settings-footer">
+      <button class="settings-btn settings-btn-reset" id="btn-reset">Reset Section</button>
+      <button class="settings-btn settings-btn-apply" id="btn-copy">Copy Values</button>
+    </div>
+  </div>
+
+  <!-- THREE.JS CANVAS -->
+  <div id="canvas-wrapper">
+    <canvas id="three-canvas"></canvas>
+  </div>
+  <div id="vignette-overlay"></div>
+
+  <!-- SCROLL CONTENT -->
+  <div id="scroll-container">
+
+    <!-- HERO -->
+    <section class="section" id="section-hero">
+      <div>
+        <h1 class="hero-headline">
+          <span class="line">Own Every</span>
+          <span class="line"><span class="stroke">Slice</span></span>
+        </h1>
+      </div>
+      <div class="hero-sub">
+        <p class="year">Pie! — Time Blocking App</p>
+        <p>Visual · Clock-Based · Minimal</p>
+        <p>Android &amp; Windows</p>
+        <div class="scroll-indicator">
+          <div class="scroll-line"></div>
+          <span>Scroll</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- OVERVIEW -->
+    <section class="section" id="section-overview">
+      <div class="overview-content">
+        <div class="section-tag reveal-line">Overview</div>
+        <h2 class="section-title">
+          <span class="reveal-word"><span class="reveal-word-inner">Built for</span></span><br>
+          <span class="reveal-word"><span class="reveal-word-inner">High</span></span>
+          <span class="reveal-word"><span class="reveal-word-inner">Performers</span></span>
+        </h2>
+        <p class="section-body reveal-fade">
+          Pie transforms your schedule into a living, interactive 12-hour clock. No lists. No noise. Just a spatial, visual command of every hour — so you never lose a slice of your day again.
+        </p>
+        <div class="stat-row">
+          <div class="stat reveal-fade">
+            <span class="stat-val">12h</span>
+            <span class="stat-label">Clock View</span>
+          </div>
+          <div class="stat reveal-fade">
+            <span class="stat-val">∞</span>
+            <span class="stat-label">Streak Days</span>
+          </div>
+          <div class="stat reveal-fade">
+            <span class="stat-val">E2E</span>
+            <span class="stat-label">Encrypted</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SPECS / FEATURES -->
+    <section class="section" id="section-specs">
+      <div class="specs-content">
+        <div class="section-tag reveal-line" style="justify-content: flex-end;">Platform</div>
+        <h2 class="section-title">
+          <span class="reveal-word"><span class="reveal-word-inner">Built to</span></span><br>
+          <span class="reveal-word"><span class="reveal-word-inner">Last</span></span>
+        </h2>
+        <ul class="specs-list">
+          <li><span class="spec-name">Interface</span><span class="spec-val">12h Pie Clock</span></li>
+          <li><span class="spec-name">Animations</span><span class="spec-val">GSAP Fluid UI</span></li>
+          <li><span class="spec-name">Design System</span><span class="spec-val">Material Design 3</span></li>
+          <li><span class="spec-name">Sync</span><span class="spec-val">Firebase Cloud</span></li>
+          <li><span class="spec-name">Security</span><span class="spec-val">Local Encryption</span></li>
+          <li><span class="spec-name">Offline</span><span class="spec-val">Full Cache Support</span></li>
+          <li><span class="spec-name">Platforms</span><span class="spec-val">Android · Windows</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- DESIGN / FEATURES GRID -->
+    <section class="section" id="section-features">
+      <div>
+        <div class="section-tag reveal-line">Core Features</div>
+        <h2 class="section-title">
+          <span class="reveal-word"><span class="reveal-word-inner">Every</span></span><br>
+          <span class="reveal-word"><span class="reveal-word-inner">Detail</span></span>
+        </h2>
+        <div class="features-grid">
+          <div class="feature-item">
+            <div class="feature-num">01</div>
+            <div class="feature-name">Pie Clock</div>
+            <div class="feature-desc">Drag and block time directly on a 12-hour clock face. Spatial scheduling that makes gaps impossible to miss.</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-num">02</div>
+            <div class="feature-name">Streak Fire</div>
+            <div class="feature-desc">Visual fire indicators that intensify with each consecutive day. Consistency has never looked this alive.</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-num">03</div>
+            <div class="feature-name">Calendar History</div>
+            <div class="feature-desc">Review your past performance, completion rates, and long-term productivity patterns at a glance.</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-num">04</div>
+            <div class="feature-name">Encrypted Notes</div>
+            <div class="feature-desc">Your reflections stay yours. Local encryption ensures your private thoughts are never exposed.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- QUOTE -->
+    <section class="section" id="section-quote">
+      <div class="quote-mark">"</div>
+      <p class="quote-text">Time is not managed. It is owned — one slice at a time.</p>
+      <p class="quote-attr"><strong>Pie!</strong> — Renaissance Minimalist Productivity, 2024</p>
+    </section>
+
+    <!-- CTA -->
+    <section class="section" id="section-cta">
+      <div class="cta-content">
+        <p class="cta-label">Available Now</p>
+        <h2 class="cta-headline">
+          <span class="line">Own Your</span>
+          <span class="line stroke">Day</span>
+        </h2>
+        <div class="cta-bottom">
+          <div class="cta-btns">
+            <a href="#" class="cta-btn">
+              Get on Android
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
             </a>
-            <ul class="nav-links">
-                <li><a href="#features">Features</a></li>
-                <li><a href="#screenshots">Gallery</a></li>
-                <li><a href="#platforms">Platforms</a></li>
-            </ul>
-            <a href="#download" class="nav-cta" id="navCta">
-                <span>Get Free</span>
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1v10M4 7l4 4 4-4M2 14h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <a href="#" class="cta-btn cta-btn-secondary">
+              Windows Desktop
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
             </a>
+          </div>
+          <div class="footer-copy">
+            <p>Pie! App</p>
+            <p>iOS &amp; macOS — Coming Soon</p>
+          </div>
         </div>
-    </nav>
-
-    <!-- ═══ CINEMATIC HERO SECTION — Dual Video Match-Cut ═══ -->
-    <section id="cinematic-hero" data-section>
-
-        <!-- Stacked scroll-scrubbed videos -->
-        <video id="vid-forge" src="./clock-forge-optimized.mp4" muted playsinline preload="auto"></video>
-        <video id="vid-celestial" src="./celestial-command-optimized.mp4" muted playsinline preload="auto"></video>
-
-        <!-- Text overlay sits above the videos -->
-        <div class="hero-video-overlay" id="heroVideoOverlay">
-            <div class="hero-eyebrow">
-                <span class="eyebrow-line"></span>
-                <span class="eyebrow-text">Now on Android &amp; Windows</span>
-                <span class="eyebrow-line"></span>
-            </div>
-
-            <h1 class="hero-title" id="heroTitle">
-                <span class="hero-brand">
-                    <span class="brand-pie">P</span><span class="brand-exclaim ligature">ie!</span>
-                </span>
-                <span class="hero-title-line serif-italic hero-sub">Own every hour.</span>
-            </h1>
-
-            <p class="hero-desc">
-                Transform your schedule into a beautiful clock-based visual.<br>
-                Block time, track streaks, build habits — ruthlessly.
-            </p>
-
-            <div class="hero-actions">
-                <a href="#download" class="btn-primary" id="heroCta">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                    Get Pie — Free
-                </a>
-                <a href="#features" class="btn-ghost">
-                    Explore Features
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-                </a>
-            </div>
-
-            <div class="hero-scroll-hint" id="heroScrollHint">
-                <div class="scroll-wheel">
-                    <div class="scroll-dot"></div>
-                </div>
-                <span>Scroll to scrub</span>
-            </div>
-        </div>
-
+      </div>
     </section>
 
-    <!-- ═══ FEATURES SECTION ═══ -->
-    <section class="features" id="features" data-section>
-        <div class="section-inner">
-            <header class="section-header">
-                <p class="section-kicker reveal-up">Features</p>
-                <h2 class="section-title reveal-up">Everything you need<br><em>to own your day.</em></h2>
-                <p class="section-body reveal-up">
-                    Pie combines visual time blocking, habit tracking, and task management
-                    into one beautifully designed experience — with zero bloat.
-                </p>
-            </header>
+  </div>
 
-            <div class="features-grid">
-                <div class="feature-card reveal-card" id="feat-clock">
-                    <div class="feat-icon-wrap feat-orange">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                    </div>
-                    <h3>Clock-Based Planning</h3>
-                    <p>See your entire day as a pie chart on a 12-hour clock. Drag, block, and visualize your time at a glance.</p>
-                    <div class="feat-hover-line"></div>
-                </div>
+  <!-- THREE.JS -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.158.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.158.0/examples/jsm/"
+    }
+  }
+  </script>
 
-                <div class="feature-card reveal-card" id="feat-streak">
-                    <div class="feat-icon-wrap feat-magenta">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-                    </div>
-                    <h3>Streak Tracking</h3>
-                    <p>Build consistency with daily streaks. Watch your fire grow as you complete tasks day after day.</p>
-                    <div class="feat-hover-line"></div>
-                </div>
+  <script type="module">
+    import * as THREE from 'three';
+    import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 
-                <div class="feature-card reveal-card" id="feat-calendar">
-                    <div class="feat-icon-wrap feat-clay">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                    </div>
-                    <h3>Calendar History</h3>
-                    <p>Review your past performance with a visual calendar. See completion rates and identify your patterns.</p>
-                    <div class="feat-hover-line"></div>
-                </div>
+    // NAV
+    window.scrollToSection = function(id) {
+      const el = document.getElementById(id);
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+      document.getElementById('nav-right').classList.remove('mobile-open');
+      document.getElementById('hamburger').classList.remove('open');
+    };
 
-                <div class="feature-card reveal-card" id="feat-notes">
-                    <div class="feat-icon-wrap feat-umber">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-                    </div>
-                    <h3>Encrypted Notes</h3>
-                    <p>Capture ideas securely with locally encrypted notes. Your thoughts stay private — always.</p>
-                    <div class="feat-hover-line"></div>
-                </div>
+    document.getElementById('hamburger').addEventListener('click', () => {
+      document.getElementById('nav-right').classList.toggle('mobile-open');
+      document.getElementById('hamburger').classList.toggle('open');
+    });
 
-                <div class="feature-card reveal-card" id="feat-tasks">
-                    <div class="feat-icon-wrap feat-magenta">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-                    </div>
-                    <h3>Smart Checklists</h3>
-                    <p>Daily tasks and persistent goals in one view. Auto-detect missed tasks and stay accountable.</p>
-                    <div class="feat-hover-line"></div>
-                </div>
+    // SCENE SETUP
+    const canvas = document.getElementById('three-canvas');
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 2.2;
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-                <div class="feature-card reveal-card" id="feat-sync">
-                    <div class="feat-icon-wrap feat-clay">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/></svg>
-                    </div>
-                    <h3>Cloud Sync</h3>
-                    <p>Powered by Firebase. Your data syncs across all devices with offline support via local caching.</p>
-                    <div class="feat-hover-line"></div>
-                </div>
-            </div>
-        </div>
-    </section>
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+    camera.position.set(0, 0.5, 5);
+    camera.lookAt(0, 0, 0);
 
-    <!-- ═══ SCREENSHOTS GALLERY ═══ -->
-    <section class="gallery" id="screenshots" data-section>
-        <div class="section-inner">
-            <header class="section-header centered">
-                <p class="section-kicker reveal-up">Gallery</p>
-                <h2 class="section-title reveal-up"><em>Designed</em> to delight.</h2>
-                <p class="section-body reveal-up">
-                    Material Design 3 with full dark mode support. Clean, precise, intentional.
-                </p>
-            </header>
+    // LIGHTS
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
+    scene.add(ambientLight);
 
-            <div class="gallery-track">
-                <div class="gallery-card reveal-card" style="--card-delay: 0s">
-                    <div class="gallery-img-wrap">
-                        <img src="screenshot_home.png" alt="Pie App — Clock View" loading="lazy">
-                        <div class="gallery-overlay">
-                            <span>Clock View</span>
-                        </div>
-                    </div>
-                    <p class="gallery-label">01 — Clock View</p>
-                </div>
-                <div class="gallery-card reveal-card" style="--card-delay: 0.12s">
-                    <div class="gallery-img-wrap">
-                        <img src="screenshot_calendar.png" alt="Pie App — Calendar History" loading="lazy">
-                        <div class="gallery-overlay">
-                            <span>Calendar History</span>
-                        </div>
-                    </div>
-                    <p class="gallery-label">02 — Calendar History</p>
-                </div>
-                <div class="gallery-card reveal-card" style="--card-delay: 0.24s">
-                    <div class="gallery-img-wrap">
-                        <img src="screenshot_streaks.png" alt="Pie App — Streak Insights" loading="lazy">
-                        <div class="gallery-overlay">
-                            <span>Streak Insights</span>
-                        </div>
-                    </div>
-                    <p class="gallery-label">03 — Streak Insights</p>
-                </div>
-            </div>
-        </div>
-    </section>
+    const keyLight = new THREE.DirectionalLight(0xfff5e0, 2.5);
+    keyLight.position.set(8, 14, 8);
+    keyLight.castShadow = true;
+    const keyLightTarget = new THREE.Object3D();
+    scene.add(keyLightTarget);
+    keyLight.target = keyLightTarget;
+    scene.add(keyLight);
 
-    <!-- ═══ MANIFESTO / STATS SECTION ═══ -->
-    <section class="manifesto" id="manifesto" data-section>
-        <div class="section-inner manifesto-inner">
-            <div class="manifesto-text">
-                <p class="section-kicker reveal-up">The Manifesto</p>
-                <h2 class="manifesto-quote reveal-up">
-                    <em>"Time is the canvas.<br>You are the artist.<br>Pie is the brush."</em>
-                </h2>
-                <p class="section-body reveal-up">
-                    Most productivity apps are built for compliance — for checking boxes and moving on.
-                    Pie was built for <strong>mastery</strong>. Every slice you block is a declaration of intent.
-                </p>
-            </div>
-            <div class="manifesto-stats">
-                <div class="stat-item reveal-card">
-                    <span class="stat-number" data-target="14" data-suffix="+">0+</span>
-                    <span class="stat-label">Day Streak Record</span>
-                </div>
-                <div class="stat-item reveal-card">
-                    <span class="stat-number" data-target="92" data-suffix="%">0%</span>
-                    <span class="stat-label">Avg Completion Rate</span>
-                </div>
-                <div class="stat-item reveal-card">
-                    <span class="stat-number" data-target="128" data-suffix="">0</span>
-                    <span class="stat-label">Tasks Crushed</span>
-                </div>
-            </div>
-        </div>
-    </section>
+    const rimLight = new THREE.DirectionalLight(0xff4500, 0.6);
+    rimLight.position.set(-4, 2, -5);
+    scene.add(rimLight);
 
-    <!-- ═══ PLATFORMS SECTION ═══ -->
-    <section class="platforms" id="platforms" data-section>
-        <div class="section-inner">
-            <header class="section-header centered">
-                <p class="section-kicker reveal-up">Availability</p>
-                <h2 class="section-title reveal-up">Everywhere<br><em>you work.</em></h2>
-            </header>
+    const fillLight = new THREE.PointLight(0xe8632a, 0.8, 10);
+    fillLight.position.set(2, -1, 3);
+    scene.add(fillLight);
 
-            <div class="platform-grid">
-                <div class="platform-card reveal-card">
-                    <div class="platform-icon">
-                        <!-- Android SVG -->
-                        <svg width="40" height="40" viewBox="0 0 24 24" fill="#a8c78a"><path d="M17.523 15.341a.752.752 0 1 1-1.503 0 .752.752 0 0 1 1.503 0zm-9.543 0a.752.752 0 1 1-1.503 0 .752.752 0 0 1 1.503 0zm12.38-4.438l1.65-2.858a.337.337 0 0 0-.124-.457.334.334 0 0 0-.457.124l-1.67 2.893A9.978 9.978 0 0 0 12 9.646c-1.49 0-2.9.323-4.16.895L6.172 7.712a.337.337 0 0 0-.458-.124.337.337 0 0 0-.124.457l1.651 2.858C4.956 12.155 3.296 14.501 3 17.25h18c-.296-2.749-1.956-5.095-4.64-6.347z"/></svg>
-                    </div>
-                    <h3>Android</h3>
-                    <p>Phones &amp; tablets</p>
-                    <span class="platform-status available">Available Now</span>
-                </div>
-                <div class="platform-card reveal-card">
-                    <div class="platform-icon">
-                        <!-- Windows SVG -->
-                        <svg width="40" height="40" viewBox="0 0 24 24" fill="#7eb7e8"><path d="M3 5.557L10.526 4.5V12H3V5.557zM11.474 4.363L21 3v9h-9.526V4.363zM3 13h7.526v7.443L3 19.441V13zm8.474 0H21v9l-9.526-1.363V13z"/></svg>
-                    </div>
-                    <h3>Windows</h3>
-                    <p>Desktop experience</p>
-                    <span class="platform-status available">Available Now</span>
-                </div>
-                <div class="platform-card reveal-card">
-                    <div class="platform-icon">
-                        <!-- Apple SVG -->
-                        <svg width="40" height="40" viewBox="0 0 24 24" fill="#c8c8c8"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
-                    </div>
-                    <h3>iOS &amp; macOS</h3>
-                    <p>Apple ecosystem</p>
-                    <span class="platform-status soon">Coming Soon</span>
-                </div>
-            </div>
-        </div>
-    </section>
+    // Load HDR environment
+    const rgbeLoader = new RGBELoader();
+    rgbeLoader.load(
+      'https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/evening_road_01_1k.hdr',
+      (hdrTexture) => {
+        hdrTexture.mapping = THREE.EquirectangularReflectionMapping;
+        scene.environment = hdrTexture;
+      }
+    );
 
-    <!-- ═══ CTA / DOWNLOAD SECTION ═══ -->
-    <section class="cta-section" id="download" data-section>
-        <div class="cta-bg-glow"></div>
-        <div class="cta-clip-wipe" id="ctaClipWipe"></div>
-        <div class="section-inner centered">
-            <p class="section-kicker reveal-up">Ready?</p>
-            <h2 class="cta-headline reveal-up">
-                Start slicing<br><em>your day.</em>
-            </h2>
-            <p class="section-body reveal-up">
-                It's free. No credit card. No excuses.<br>
-                Join thousands who plan their day with Pie.
-            </p>
-            <div class="cta-actions reveal-up">
-                <a href="#" class="btn-primary btn-xl" id="mainCta">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                    Download for Free
-                </a>
-                <a href="#features" class="btn-ghost">
-                    Explore Features
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
-                </a>
-            </div>
-        </div>
-    </section>
+    // ══════════════════════════════════════════════════
+    // BUILD PROCEDURAL CLOCK — Logo-accurate recreation
+    // Logo: thick silver bezel, concentric brushed face,
+    //       glowing lava-orange wedge 12→3 o'clock (90°),
+    //       dark slate hands (hour→9, minute→3),
+    //       chrome boss center cap, deep watch-case depth
+    // ══════════════════════════════════════════════════
+    const clockGroup = new THREE.Group();
 
-    <!-- ═══ Footer ═══ -->
-    <footer class="footer">
-        <div class="footer-inner">
-            <div class="footer-logo">
-                <img src="app_icon.png" alt="Pie" width="28" height="28">
-                <span>Pie!</span>
-            </div>
-            <div class="footer-links">
-                <a href="https://DravinRai.github.io/pie-privacy-policy/" target="_blank" rel="noopener">Privacy Policy</a>
-                <a href="mailto:support@example.com">Contact</a>
-            </div>
-            <p class="footer-copy">
-                © 2026 Pie. Crafted with obsession by <strong>Ankit Rai</strong>.
-            </p>
-        </div>
-    </footer>
+    // ── MATERIALS ──────────────────────────────────
 
-    <!-- ═══ Scripts ═══ -->
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/gsap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.7/dist/ScrollTrigger.min.js"></script>
-    <script src="script.js"></script>
+    // Outer bezel — bright brushed silver, high metalness
+    const bezelMat = new THREE.MeshStandardMaterial({
+      color: 0xc2c0bc,
+      metalness: 0.96,
+      roughness: 0.12,
+      envMapIntensity: 1.6,
+    });
+
+    // Inner step bezel — slightly darker silver
+    const bezelInnerMat = new THREE.MeshStandardMaterial({
+      color: 0xa8a6a2,
+      metalness: 0.92,
+      roughness: 0.18,
+      envMapIntensity: 1.3,
+    });
+
+    // Clock face — warm light grey, concentric-brushed look
+    // Use a slight roughness gradient via two layers
+    const faceMat = new THREE.MeshStandardMaterial({
+      color: 0xd8d4ce,
+      metalness: 0.55,
+      roughness: 0.28,
+      envMapIntensity: 0.9,
+    });
+
+    // Face inner disc — slightly lighter/more reflective center
+    const faceInnerMat = new THREE.MeshStandardMaterial({
+      color: 0xe2deda,
+      metalness: 0.5,
+      roughness: 0.22,
+      envMapIntensity: 0.75,
+    });
+
+    // Wedge — lava orange, emissive glow, slightly translucent
+    const wedgeMat = new THREE.MeshStandardMaterial({
+      color: 0xd94e10,
+      emissive: 0xff4400,
+      emissiveIntensity: 1.1,
+      metalness: 0.0,
+      roughness: 0.55,
+      transparent: true,
+      opacity: 0.94,
+    });
+
+    // Tick marks — major: near-black, minor: medium grey
+    const tickMajorMat = new THREE.MeshStandardMaterial({ color: 0x2a2a2a, metalness: 0.5, roughness: 0.4 });
+    const tickMinorMat = new THREE.MeshStandardMaterial({ color: 0x888880, metalness: 0.4, roughness: 0.5 });
+
+    // Clock hands — dark slate grey, tapered, metallic sheen
+    const handMat = new THREE.MeshStandardMaterial({
+      color: 0x5a5a5a,
+      metalness: 0.88,
+      roughness: 0.12,
+      envMapIntensity: 1.8,
+    });
+
+    // Center boss cap — polished chrome sphere
+    const capMat = new THREE.MeshStandardMaterial({
+      color: 0xb8b8b8,
+      metalness: 0.98,
+      roughness: 0.04,
+      envMapIntensity: 2.4,
+    });
+
+    // Case/back — brushed gunmetal
+    const caseMat = new THREE.MeshStandardMaterial({
+      color: 0x909090,
+      metalness: 0.9,
+      roughness: 0.22,
+      envMapIntensity: 1.2,
+    });
+
+    // ── OUTER WATCH CASE (deep cylinder — gives watch-case depth) ──
+    // This is the thick outer ring visible when rotated sideways
+    const caseDepth = 0.72; // deep like the logo
+    const outerR = 2.08;
+    const outerCase = new THREE.Mesh(
+      new THREE.CylinderGeometry(outerR, outerR, caseDepth, 96),
+      bezelMat
+    );
+    outerCase.rotation.x = Math.PI / 2;
+    clockGroup.add(outerCase);
+
+    // ── BEZEL STEP (inner stepped ring, inset) ──
+    const stepRing = new THREE.Mesh(
+      new THREE.CylinderGeometry(1.90, 1.90, caseDepth + 0.04, 96),
+      bezelInnerMat
+    );
+    stepRing.rotation.x = Math.PI / 2;
+    clockGroup.add(stepRing);
+
+    // ── CLOCK FACE DISC ──
+    const faceZ = caseDepth * 0.5 - 0.04; // flush with front lip
+    const face = new THREE.Mesh(
+      new THREE.CylinderGeometry(1.84, 1.84, 0.06, 96),
+      faceMat
+    );
+    face.rotation.x = Math.PI / 2;
+    face.position.z = faceZ;
+    clockGroup.add(face);
+
+    // Face inner lighter disc (concentric brushed look — lighter center)
+    const faceInner = new THREE.Mesh(
+      new THREE.CylinderGeometry(1.20, 1.20, 0.065, 80),
+      faceInnerMat
+    );
+    faceInner.rotation.x = Math.PI / 2;
+    faceInner.position.z = faceZ + 0.005;
+    clockGroup.add(faceInner);
+
+    // ── PIE WEDGE — exactly 12 o'clock → 3 o'clock (90°) ──
+    // In screen coords: 12 = top = +Y = angle 90°, 3 = right = +X = 0°
+    // Three.js Shape: x=right, y=up, so:
+    //   12 o'clock = angle = PI/2 from +X axis
+    //   3 o'clock  = angle = 0
+    const wedgeRadius = 1.80;
+    const wedgeStartAngle = Math.PI / 2;   // 12 o'clock
+    const wedgeEndAngle   = 0;             // 3 o'clock (90° clockwise)
+
+    const wedgeShape = new THREE.Shape();
+    wedgeShape.moveTo(0, 0);
+    wedgeShape.absarc(0, 0, wedgeRadius, wedgeStartAngle, wedgeEndAngle, true); // clockwise
+    wedgeShape.lineTo(0, 0);
+
+    const wedgeGeo = new THREE.ShapeGeometry(wedgeShape, 80);
+    const wedgeMesh = new THREE.Mesh(wedgeGeo, wedgeMat);
+    wedgeMesh.position.z = faceZ + 0.038;
+    clockGroup.add(wedgeMesh);
+
+    // Orange under-glow light — positioned inside the wedge region
+    const wedgeGlow = new THREE.PointLight(0xff4400, 2.4, 4.0);
+    wedgeGlow.position.set(1.0, 0.6, faceZ + 0.5);
+    clockGroup.add(wedgeGlow);
+
+    // Secondary softer glow for bloom effect
+    const wedgeGlow2 = new THREE.PointLight(0xff7700, 0.8, 6.0);
+    wedgeGlow2.position.set(0.5, 0.3, 1.2);
+    clockGroup.add(wedgeGlow2);
+
+    // ── TICK MARKS — 60 ticks, inner edge of bezel ──
+    // Ticks sit on the face near the bezel, pointing inward
+    const TICK_RADIUS = 1.70; // center of tick bar
+    for (let i = 0; i < 60; i++) {
+      const isMajor = i % 5 === 0;
+      const tickH   = isMajor ? 0.16 : 0.08;
+      const tickW   = isMajor ? 0.038 : 0.020;
+      const tickD   = 0.035;
+      const angle   = (i / 60) * Math.PI * 2 - Math.PI / 2; // start from top (12)
+
+      const geo = new THREE.BoxGeometry(tickW, tickH, tickD);
+      const tick = new THREE.Mesh(geo, isMajor ? tickMajorMat : tickMinorMat);
+      tick.position.set(
+        Math.cos(angle) * TICK_RADIUS,
+        Math.sin(angle) * TICK_RADIUS,
+        faceZ + 0.055
+      );
+      tick.rotation.z = angle + Math.PI / 2;
+      clockGroup.add(tick);
+    }
+
+    // ── CLOCK HANDS ──────────────────────────────────
+    // Logo: hour hand points to ~9 (left), minute hand points to ~3 (right)
+    // Both hands are tapered rectangles, dark slate, rounded tip feel
+
+    // Helper: build tapered hand using Shape extrusion
+    function makeHand(length, baseW, tipW, depth) {
+      const s = new THREE.Shape();
+      s.moveTo(-baseW / 2, 0);
+      s.lineTo(baseW / 2, 0);
+      s.lineTo(tipW / 2, length);
+      s.lineTo(-tipW / 2, length);
+      s.closePath();
+      const geo = new THREE.ExtrudeGeometry(s, { depth, bevelEnabled: false });
+      geo.translate(0, 0, -depth / 2);
+      return geo;
+    }
+
+    // HOUR HAND — shorter, wider — pointing left (~9 o'clock = 270° = -90° from +X = left)
+    // 9 o'clock in our shape space: rotate so hand tip goes left
+    // Hand geometry points upward (+Y) by default, so rotate -PI/2 - extra for 9
+    const hourHandGeo = makeHand(0.88, 0.085, 0.030, 0.055);
+    const hourHand = new THREE.Mesh(hourHandGeo, handMat);
+    // 9 o'clock: from top (12), 9 is 270° CW = 3/4 turn left
+    // In our world: 12 = +Y = PI/2. 9 = -X = PI. So rotation from default-up: PI
+    hourHand.rotation.z = Math.PI;     // pointing to 9 o'clock (left)
+    hourHand.position.z = faceZ + 0.09;
+    clockGroup.add(hourHand);
+
+    // MINUTE HAND — longer, slimmer — pointing right (~3 o'clock = 0° = +X)
+    const minuteHandGeo = makeHand(1.32, 0.062, 0.020, 0.050);
+    const minuteHand = new THREE.Mesh(minuteHandGeo, handMat);
+    // 3 o'clock: from top (12), 3 is 90° CW = PI/2 CW = -PI/2 rotation from +Y
+    minuteHand.rotation.z = -Math.PI / 2;  // pointing to 3 o'clock (right)
+    minuteHand.position.z = faceZ + 0.10;
+    clockGroup.add(minuteHand);
+
+    // Short counter-tail on each hand (small stub behind center)
+    const hourTailGeo = makeHand(0.16, 0.075, 0.06, 0.05);
+    const hourTail = new THREE.Mesh(hourTailGeo, handMat);
+    hourTail.rotation.z = 0;    // tail goes opposite to hour (pointing 3)
+    hourTail.position.z = faceZ + 0.088;
+    clockGroup.add(hourTail);
+
+    const minuteTailGeo = makeHand(0.14, 0.055, 0.04, 0.045);
+    const minuteTail = new THREE.Mesh(minuteTailGeo, handMat);
+    minuteTail.rotation.z = Math.PI / 2;  // tail opposite to minute (pointing 9)
+    minuteTail.position.z = faceZ + 0.098;
+    clockGroup.add(minuteTail);
+
+    // ── CENTER BOSS CAP — chrome sphere-ish disc ──
+    // Outer ring of cap
+    const capRingGeo = new THREE.CylinderGeometry(0.13, 0.13, 0.08, 48);
+    const capRing = new THREE.Mesh(capRingGeo, bezelMat);
+    capRing.rotation.x = Math.PI / 2;
+    capRing.position.z = faceZ + 0.12;
+    clockGroup.add(capRing);
+
+    // Inner polished dome
+    const capDome = new THREE.Mesh(
+      new THREE.SphereGeometry(0.09, 32, 32, 0, Math.PI * 2, 0, Math.PI / 2),
+      capMat
+    );
+    capDome.rotation.x = -Math.PI / 2;
+    capDome.position.z = faceZ + 0.16;
+    clockGroup.add(capDome);
+
+    // ── BACK PLATE ──
+    const backPlate = new THREE.Mesh(
+      new THREE.CylinderGeometry(outerR, outerR, 0.10, 96),
+      caseMat
+    );
+    backPlate.rotation.x = Math.PI / 2;
+    backPlate.position.z = -(caseDepth * 0.5) - 0.01;
+    clockGroup.add(backPlate);
+
+    // ── FRONT LIP RING (thin chrome edge, visible from front) ──
+    const frontLip = new THREE.Mesh(
+      new THREE.TorusGeometry(outerR - 0.01, 0.06, 12, 96),
+      bezelMat
+    );
+    frontLip.position.z = caseDepth * 0.5 + 0.02;
+    clockGroup.add(frontLip);
+
+    // ── SUBTLE ORANGE AMBIENT UNDER-GLOW (simulates logo edge glow) ──
+    const edgeGlow = new THREE.PointLight(0xff5500, 0.5, 8);
+    edgeGlow.position.set(0, -2.5, 0.5);
+    clockGroup.add(edgeGlow);
+
+    scene.add(clockGroup);
+
+    // ─────────────────────────────────────
+    // DRAG TO ROTATE (yaw)
+    // ─────────────────────────────────────
+    let isDragging = false;
+    let dragStartX = 0;
+    let manualYaw = 0;
+    let manualYawTarget = 0;
+
+    const c = document.getElementById('three-canvas');
+
+    // We'll allow drag only on the canvas behind the pointer-events: none overlay
+    // Actually canvas is pointer-events:none, so we listen on document
+    document.addEventListener('pointerdown', (e) => {
+      if (e.target.closest('#settings-panel, #scene-panel, #side-toggles, nav, #drag-hint')) return;
+      isDragging = true;
+      dragStartX = e.clientX;
+      document.getElementById('drag-hint').classList.remove('visible');
+    });
+
+    document.addEventListener('pointermove', (e) => {
+      if (!isDragging) return;
+      const dx = e.clientX - dragStartX;
+      dragStartX = e.clientX;
+      manualYawTarget += dx * 0.008;
+    });
+
+    document.addEventListener('pointerup', () => { isDragging = false; });
+
+    // Show drag hint after 2s if user hasn't scrolled
+    let hintTimer = setTimeout(() => {
+      document.getElementById('drag-hint').classList.add('visible');
+    }, 2500);
+
+    window.addEventListener('scroll', () => {
+      document.getElementById('drag-hint').classList.remove('visible');
+    }, { passive: true, once: true });
+
+    // ─────────────────────────────────────
+    // KEYFRAMES (camera & clock position)
+    // ─────────────────────────────────────
+    const defaultKeyframes = [
+      // Hero: front-quarter view, classic
+      { x: 0.0, z: 0.0, cx: -0.3, cy: 0.4,  cz: 5.0,  lx: 0.0,  ly: 0.0,  lz: 0.0,  fov: 45,  yaw: 0.0 },
+      // Overview: rear-quarter, reveal the back
+      { x: 0.5, z: 0.0, cx: 0.3,  cy: 0.1,  cz: 6.5,  lx: 0.5,  ly: 0.0,  lz: 0.0,  fov: 22,  yaw: -2.1 },
+      // Specs: front straight-on
+      { x: -0.4,z: 0.0, cx: -2.0, cy: -0.2, cz: 4.5,  lx: 0.0,  ly: 0.0,  lz: 0.0,  fov: 38,  yaw: 0.12 },
+      // Features: top-down / overhead
+      { x: 0.0, z: 0.0, cx: 0.0,  cy: 5.5,  cz: 1.5,  lx: 0.0,  ly: 0.0,  lz: 0.0,  fov: 28,  yaw: 1.57 },
+      // Quote: front-on zoom into face
+      { x: 0.0, z: 0.0, cx: 0.0,  cy: 0.2,  cz: 3.5,  lx: 0.0,  ly: 0.0,  lz: 0.0,  fov: 34,  yaw: 0.0 },
+      // CTA: side view
+      { x: 0.0, z: 0.0, cx: 4.5,  cy: 0.2,  cz: 4.5,  lx: 0.0,  ly: 0.0,  lz: 0.0,  fov: 22,  yaw: 0.0 },
+    ];
+
+    const keyframes = defaultKeyframes.map(k => ({ ...k }));
+
+    // ─────────────────────────────────────
+    // CAMERA SETTINGS PANEL
+    // ─────────────────────────────────────
+    const sectionNames = ['Hero', 'Overview', 'Features', 'Design', 'Quote', 'CTA'];
+    let activeTabIdx = 0;
+
+    const settingsToggle = document.getElementById('settings-toggle');
+    const settingsPanel  = document.getElementById('settings-panel');
+    const tabsEl         = document.getElementById('settings-tabs');
+    const bodyEl         = document.getElementById('settings-body');
+
+    const sceneToggleBtn = document.getElementById('scene-toggle');
+    const scenePanel     = document.getElementById('scene-panel');
+    const sideToggles    = document.getElementById('side-toggles');
+
+    sceneToggleBtn.addEventListener('click', () => {
+      const isOpen = scenePanel.style.transform === 'translateX(0%)';
+      if (isOpen) {
+        scenePanel.style.transform = 'translateX(100%)';
+        sceneToggleBtn.classList.remove('active-panel');
+        sideToggles.classList.remove('open');
+      } else {
+        scenePanel.style.transform = 'translateX(0%)';
+        sceneToggleBtn.classList.add('active-panel');
+        sideToggles.classList.add('open');
+        settingsPanel.classList.remove('open');
+        settingsToggle.classList.remove('active-panel');
+      }
+    });
+
+    settingsToggle.addEventListener('click', () => {
+      const isOpen = settingsPanel.classList.contains('open');
+      if (isOpen) {
+        settingsPanel.classList.remove('open');
+        settingsToggle.classList.remove('active-panel');
+        sideToggles.classList.remove('open');
+      } else {
+        settingsPanel.classList.add('open');
+        settingsToggle.classList.add('active-panel');
+        sideToggles.classList.add('open');
+        scenePanel.style.transform = 'translateX(100%)';
+        sceneToggleBtn.classList.remove('active-panel');
+      }
+    });
+
+    const camControls = [
+      { key: 'x',   label: 'Clock X',    min: -5,   max: 5,   step: 0.01 },
+      { key: 'z',   label: 'Clock Z',    min: -5,   max: 5,   step: 0.01 },
+      { key: 'cx',  label: 'Camera X',   min: -10,  max: 10,  step: 0.01 },
+      { key: 'cy',  label: 'Camera Y',   min: -5,   max: 10,  step: 0.01 },
+      { key: 'cz',  label: 'Camera Z',   min: -5,   max: 20,  step: 0.05 },
+      { key: 'lx',  label: 'Look-At X',  min: -5,   max: 5,   step: 0.01 },
+      { key: 'ly',  label: 'Look-At Y',  min: -5,   max: 5,   step: 0.01 },
+      { key: 'lz',  label: 'Look-At Z',  min: -5,   max: 5,   step: 0.01 },
+      { key: 'fov', label: 'FOV',        min: 10,   max: 120, step: 0.5  },
+      { key: 'yaw', label: 'Orbit Yaw',  min: -Math.PI, max: Math.PI, step: 0.01 },
+    ];
+
+    function buildTabs() {
+      tabsEl.innerHTML = '';
+      sectionNames.forEach((name, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'tab-btn' + (i === activeTabIdx ? ' active' : '');
+        btn.textContent = name;
+        btn.addEventListener('click', () => {
+          activeTabIdx = i;
+          buildTabs(); buildControls();
+          const sections = document.querySelectorAll('.section');
+          window.scrollTo({ top: sections[i].offsetTop + 10, behavior: 'smooth' });
+        });
+        tabsEl.appendChild(btn);
+      });
+    }
+
+    function buildControls() {
+      bodyEl.innerHTML = '';
+      const kf = keyframes[activeTabIdx];
+      const badge = document.createElement('div');
+      badge.className = 'section-name-badge';
+      badge.textContent = sectionNames[activeTabIdx];
+      bodyEl.appendChild(badge);
+
+      camControls.forEach(ctrl => {
+        const group = document.createElement('div');
+        group.className = 'ctrl-group';
+        const lbl = document.createElement('label');
+        lbl.className = 'ctrl-label';
+        lbl.innerHTML = `${ctrl.label} <span id="val-${ctrl.key}">${kf[ctrl.key].toFixed(2)}</span>`;
+        const slider = document.createElement('input');
+        slider.type = 'range'; slider.className = 'ctrl-slider';
+        slider.min = ctrl.min; slider.max = ctrl.max; slider.step = ctrl.step;
+        slider.value = kf[ctrl.key];
+        slider.addEventListener('input', () => {
+          const val = parseFloat(slider.value);
+          keyframes[activeTabIdx][ctrl.key] = val;
+          document.getElementById(`val-${ctrl.key}`).textContent = val.toFixed(2);
+        });
+        group.appendChild(lbl); group.appendChild(slider);
+        bodyEl.appendChild(group);
+      });
+    }
+
+    document.getElementById('btn-reset').addEventListener('click', () => {
+      keyframes[activeTabIdx] = { ...defaultKeyframes[activeTabIdx] };
+      buildControls();
+    });
+
+    document.getElementById('btn-copy').addEventListener('click', () => {
+      const kf = keyframes[activeTabIdx];
+      navigator.clipboard.writeText(JSON.stringify(kf, null, 2)).catch(() => {});
+      const btn = document.getElementById('btn-copy');
+      btn.textContent = 'Copied!';
+      setTimeout(() => btn.textContent = 'Copy Values', 1500);
+    });
+
+    // ─────────────────────────────────────
+    // SCENE CONTROLS
+    // ─────────────────────────────────────
+    const sceneDefaults = {
+      exposure: 2.2,
+      keyIntensity: 2.5,
+      rimIntensity: 0.6,
+      fillIntensity: 0.8,
+      wedgeGlow: 1.8,
+      envIntensity: 1.0,
+    };
+    let sceneValues = { ...sceneDefaults };
+
+    const sceneControlsDef = [
+      { section: 'Renderer', controls: [
+        { key: 'exposure', label: 'Exposure', min: 0.1, max: 5.0, step: 0.01 },
+      ]},
+      { section: 'Key Light', controls: [
+        { key: 'keyIntensity', label: 'Intensity', min: 0, max: 8, step: 0.01 },
+      ]},
+      { section: 'Rim Light', controls: [
+        { key: 'rimIntensity', label: 'Intensity', min: 0, max: 4, step: 0.01 },
+      ]},
+      { section: 'Pie Wedge Glow', controls: [
+        { key: 'wedgeGlow', label: 'Glow Intensity', min: 0, max: 6, step: 0.01 },
+      ]},
+    ];
+
+    function applySceneValues() {
+      renderer.toneMappingExposure = sceneValues.exposure;
+      keyLight.intensity = sceneValues.keyIntensity;
+      rimLight.intensity = sceneValues.rimIntensity;
+      fillLight.intensity = sceneValues.fillIntensity;
+      wedgeGlow.intensity = sceneValues.wedgeGlow;
+    }
+
+    function buildSceneControls() {
+      const body = document.getElementById('scene-body');
+      body.innerHTML = '';
+      sceneControlsDef.forEach(group => {
+        const secBadge = document.createElement('div');
+        secBadge.className = 'section-name-badge';
+        secBadge.textContent = group.section;
+        body.appendChild(secBadge);
+        group.controls.forEach(ctrl => {
+          const grp = document.createElement('div'); grp.className = 'ctrl-group';
+          const lbl = document.createElement('label'); lbl.className = 'ctrl-label';
+          lbl.innerHTML = `${ctrl.label} <span id="sv-${ctrl.key}">${sceneValues[ctrl.key].toFixed(2)}</span>`;
+          const slider = document.createElement('input');
+          slider.type = 'range'; slider.className = 'ctrl-slider';
+          slider.min = ctrl.min; slider.max = ctrl.max; slider.step = ctrl.step;
+          slider.value = sceneValues[ctrl.key];
+          slider.addEventListener('input', () => {
+            const val = parseFloat(slider.value);
+            sceneValues[ctrl.key] = val;
+            document.getElementById(`sv-${ctrl.key}`).textContent = val.toFixed(2);
+            applySceneValues();
+          });
+          grp.appendChild(lbl); grp.appendChild(slider); body.appendChild(grp);
+        });
+      });
+    }
+
+    buildTabs(); buildControls();
+    buildSceneControls(); applySceneValues();
+
+    document.getElementById('btn-scene-reset').addEventListener('click', () => {
+      sceneValues = { ...sceneDefaults };
+      applySceneValues(); buildSceneControls();
+    });
+
+    document.getElementById('btn-scene-export').addEventListener('click', () => {
+      navigator.clipboard.writeText(JSON.stringify(sceneValues, null, 2)).catch(() => {});
+      const btn = document.getElementById('btn-scene-export');
+      btn.textContent = 'Copied!';
+      setTimeout(() => btn.textContent = 'Copy Values', 1500);
+    });
+
+    // ─────────────────────────────────────
+    // SCROLL ANIMATION LOOP
+    // ─────────────────────────────────────
+    const sections = document.querySelectorAll('.section');
+    const navLinks = document.querySelectorAll('[data-nav-section]');
+    const sectionIds = ['section-hero','section-overview','section-specs','section-features','section-quote','section-cta'];
+
+    let scrollY = 0;
+    let currentCX = -0.3, currentCY = 0.4,  currentCZ = 5.0;
+    let targetCX  = -0.3, targetCY  = 0.4,  targetCZ  = 5.0;
+    let currentLX = 0.0,  currentLY = 0.0,  currentLZ = 0.0;
+    let targetLX  = 0.0,  targetLY  = 0.0,  targetLZ  = 0.0;
+    let currentFOV = 45,  targetFOV = 45;
+    let currentX = 0.0,   currentZ = 0.0;
+    let targetX  = 0.0,   targetZ  = 0.0;
+    let currentYaw = 0.0, targetYawKF = 0.0;
+
+    const progressBar = document.getElementById('progress-bar');
+
+    function updateNavHighlight() {
+      const mid = window.innerHeight * 0.45;
+      let current = sectionIds[0];
+      for (const id of sectionIds) {
+        const el = document.getElementById(id);
+        if (el && el.getBoundingClientRect().top <= mid) current = id;
+      }
+      navLinks.forEach(a => a.classList.toggle('nav-active', a.dataset.navSection === current));
+    }
+
+    function lerp(a, b, t) { return a + (b - a) * t; }
+    function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+
+    window.addEventListener('scroll', () => {
+      scrollY = window.scrollY;
+      updateNavHighlight();
+    }, { passive: true });
+
+    updateNavHighlight();
+
+    function getSectionScrollData() {
+      const tops = Array.from(sections).map(s => s.offsetTop);
+      const bottoms = tops.map((t, i) => i < tops.length - 1 ? tops[i + 1] : document.body.scrollHeight);
+      for (let i = 0; i < tops.length - 1; i++) {
+        if (scrollY < bottoms[i]) {
+          const segLen = bottoms[i] - tops[i];
+          const segProgress = Math.max(0, scrollY - tops[i]);
+          const t = segLen > 0 ? Math.min(segProgress / segLen, 1) : 0;
+          return { sectionIdx: i, sectionT: easeOutCubic(t) };
+        }
+      }
+      return { sectionIdx: tops.length - 1, sectionT: 1 };
+    }
+
+    let time = 0;
+
+    function tick() {
+      requestAnimationFrame(tick);
+      time += 0.008;
+
+      // Hands hold logo position — very subtle breath animation
+      minuteHand.rotation.z = -Math.PI / 2 + Math.sin(time * 0.18) * 0.012;
+      minuteTail.rotation.z =  Math.PI / 2 + Math.sin(time * 0.18) * 0.012;
+      hourHand.rotation.z   =  Math.PI     + Math.sin(time * 0.07) * 0.008;
+      hourTail.rotation.z   =  0           + Math.sin(time * 0.07) * 0.008;
+
+      // Wedge lava glow pulse — breathing fire effect
+      const pulse = Math.sin(time * 1.8) * 0.4 + Math.sin(time * 0.9) * 0.2;
+      wedgeGlow.intensity  = sceneValues.wedgeGlow + pulse;
+      wedgeGlow2.intensity = 0.8 + Math.sin(time * 1.2) * 0.2;
+      wedgeMat.emissiveIntensity = 1.1 + Math.sin(time * 1.8) * 0.2;
+      edgeGlow.intensity = 0.5 + Math.sin(time * 0.6) * 0.15;
+
+      // Progress bar
+      const totalHeight = document.body.scrollHeight - window.innerHeight;
+      const scrollFrac = Math.min(scrollY / totalHeight, 1);
+      progressBar.style.width = (scrollFrac * 100) + '%';
+
+      // Get section
+      const { sectionIdx, sectionT } = getSectionScrollData();
+      const clampedIdx = Math.min(sectionIdx, keyframes.length - 1);
+      const kA = keyframes[clampedIdx];
+      const kB = keyframes[Math.min(clampedIdx + 1, keyframes.length - 1)];
+
+      targetX   = lerp(kA.x,   kB.x,   sectionT);
+      targetZ   = lerp(kA.z,   kB.z,   sectionT);
+      targetCX  = lerp(kA.cx,  kB.cx,  sectionT);
+      targetCY  = lerp(kA.cy,  kB.cy,  sectionT);
+      targetCZ  = lerp(kA.cz,  kB.cz,  sectionT);
+      targetLX  = lerp(kA.lx,  kB.lx,  sectionT);
+      targetLY  = lerp(kA.ly,  kB.ly,  sectionT);
+      targetLZ  = lerp(kA.lz,  kB.lz,  sectionT);
+      targetFOV = lerp(kA.fov, kB.fov, sectionT);
+      targetYawKF = lerp(kA.yaw, kB.yaw, sectionT);
+
+      const lerpSpeed = 0.045;
+
+      // Smooth lerp clock position
+      currentX = lerp(currentX, targetX, lerpSpeed);
+      currentZ = lerp(currentZ, targetZ, lerpSpeed);
+      clockGroup.position.x = currentX;
+      clockGroup.position.z = currentZ;
+
+      // Smooth lerp camera
+      currentCX = lerp(currentCX, targetCX, lerpSpeed);
+      currentCY = lerp(currentCY, targetCY, lerpSpeed);
+      currentCZ = lerp(currentCZ, targetCZ, lerpSpeed);
+      currentLX = lerp(currentLX, targetLX, lerpSpeed);
+      currentLY = lerp(currentLY, targetLY, lerpSpeed);
+      currentLZ = lerp(currentLZ, targetLZ, lerpSpeed);
+      currentFOV = lerp(currentFOV, targetFOV, lerpSpeed);
+
+      camera.fov = currentFOV;
+      camera.updateProjectionMatrix();
+
+      // Manual drag yaw + keyframe yaw combined
+      manualYaw = lerp(manualYaw, manualYawTarget, 0.08);
+      const totalYaw = targetYawKF + manualYaw;
+      currentYaw = lerp(currentYaw, totalYaw, lerpSpeed);
+
+      // Orbit camera
+      const lookAt = new THREE.Vector3(currentLX, currentLY, currentLZ);
+      const baseOffset = new THREE.Vector3(
+        currentCX - currentLX,
+        currentCY - currentLY,
+        currentCZ - currentLZ
+      );
+      const orbitMat = new THREE.Matrix4().makeRotationY(currentYaw);
+      const rotatedOffset = baseOffset.clone().applyMatrix4(orbitMat);
+      camera.position.copy(lookAt.clone().add(rotatedOffset));
+      camera.lookAt(lookAt);
+
+      // Key light follows
+      const lightRadius = 10;
+      const LIGHT_ANGLE = Math.PI * 0.18;
+      keyLight.position.set(
+        currentX + Math.sin(LIGHT_ANGLE) * lightRadius,
+        14,
+        currentZ + Math.cos(LIGHT_ANGLE) * lightRadius
+      );
+      keyLightTarget.position.set(currentX, 0, currentZ);
+      keyLightTarget.updateMatrixWorld();
+
+      rimLight.position.set(currentX - 4, 2, currentZ - 5);
+
+      renderer.render(scene, camera);
+    }
+
+    tick();
+
+    // ═══════════════════════════════════════════
+    // SCROLL TEXT REVEAL — IntersectionObserver
+    // ═══════════════════════════════════════════
+    (function initReveal() {
+      // 1. Split .section-title words into reveal-word spans (if not already done in HTML)
+      //    (HTML already has them for most sections — skip re-splitting)
+
+      // 2. Observe .reveal-word, .reveal-fade, .reveal-line, .feature-item, .specs-list, .quote-text
+      const THRESHOLD = 0.15;
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            // Don't unobserve — keep visible after first trigger
+          }
+        });
+      }, { threshold: THRESHOLD });
+
+      // Observe all reveal targets
+      document.querySelectorAll(
+        '.reveal-word, .reveal-fade, .reveal-line, .feature-item, .specs-list'
+      ).forEach(el => observer.observe(el));
+
+      // Quote text — split into word spans for word-by-word reveal
+      const quoteEl = document.querySelector('.quote-text');
+      if (quoteEl) {
+        const words = quoteEl.textContent.trim().split(/\s+/);
+        quoteEl.innerHTML = words.map((w, i) =>
+          `<span class="quote-char" style="transition-delay:${(i * 0.045).toFixed(3)}s">${w}</span>`
+        ).join(' ');
+
+        const quoteObserver = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.querySelectorAll('.quote-char').forEach(c => c.classList.add('is-visible'));
+            }
+          });
+        }, { threshold: 0.3 });
+        quoteObserver.observe(quoteEl);
+      }
+
+      // CTA headline — word reveal
+      const ctaHeadline = document.querySelector('.cta-headline');
+      if (ctaHeadline) {
+        // Already has span.line children — wrap each in reveal structure
+        ctaHeadline.querySelectorAll('.line').forEach((line, li) => {
+          const words = line.innerHTML.split(/(\s+)/);
+          // Don't re-wrap if already wrapped
+          if (!line.querySelector('.reveal-word')) {
+            line.innerHTML = line.textContent.trim().split(/\s+/).map((w, wi) =>
+              `<span class="reveal-word" style="display:inline-block;overflow:hidden;"><span class="reveal-word-inner" style="transition-delay:${(li * 0.15 + wi * 0.1).toFixed(2)}s">${w}</span></span>`
+            ).join(' ');
+          }
+        });
+
+        const ctaObserver = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.querySelectorAll('.reveal-word').forEach(w => w.classList.add('is-visible'));
+            }
+          });
+        }, { threshold: 0.2 });
+        ctaObserver.observe(ctaHeadline);
+      }
+
+      // Stats — count-up animation
+      const stats = document.querySelectorAll('.stat');
+      const statObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            const val = entry.target.querySelector('.stat-val');
+            if (val && !val.dataset.counted) {
+              val.dataset.counted = '1';
+              const finalText = val.textContent;
+              const num = parseFloat(finalText);
+              if (!isNaN(num)) {
+                let start = 0;
+                const duration = 1200;
+                const startTime = performance.now();
+                const decimals = finalText.includes('.') ? 1 : 0;
+                const suffix = finalText.replace(/[\d.]/g, '');
+                function countUp(now) {
+                  const elapsed = now - startTime;
+                  const progress = Math.min(elapsed / duration, 1);
+                  const eased = 1 - Math.pow(1 - progress, 3);
+                  val.textContent = (num * eased).toFixed(decimals) + suffix;
+                  if (progress < 1) requestAnimationFrame(countUp);
+                  else val.textContent = finalText;
+                }
+                requestAnimationFrame(countUp);
+              }
+            }
+          }
+        });
+      }, { threshold: 0.5 });
+      stats.forEach(s => statObserver.observe(s));
+
+    })();
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+  </script>
+
 </body>
 </html>
